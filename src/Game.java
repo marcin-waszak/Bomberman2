@@ -35,8 +35,8 @@ public class Game extends Canvas {
 		requestFocus();
 		
 		// finally make the window visible 
-		frame.pack();
 		frame.setResizable(false);
+		frame.pack();
 		frame.setVisible(true);
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
