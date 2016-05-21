@@ -3,17 +3,23 @@ import java.awt.Graphics2D;
 public abstract class Entity {
 	protected double x;
 	protected double y;
+	protected Board board;
 
 	public Entity(double x, double y) {
-		SetPosition(x, y);
+		setPosition(x, y);
+		board = null;
 	}
 	
-	public void SetPosition(double x, double y) {
+	public void setBoard(Board board) {
+		this.board = board;
+	}
+	
+	public void setPosition(double x, double y) {
 		this.x = x;
 		this.y = y;
 	}
 	
-	public void Move(double dx, double dy) {
+	public void move(double dx, double dy) {
 		this.x += dx;
 		this.y += dy;
 	}
