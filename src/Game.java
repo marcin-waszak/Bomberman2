@@ -28,9 +28,6 @@ public class Game extends Canvas {
 		// going to do that our self in accelerated mode
 		setIgnoreRepaint(true);
 		
-		// request the focus so key events come to us
-		requestFocus();
-		
 		// finally make the window visible 
 		frame.setResizable(false);
 		frame.setVisible(true);
@@ -40,8 +37,11 @@ public class Game extends Canvas {
 		
 		// add a key input system (defined below) to our canvas
 		// so we can respond to key pressed
-//		addKeyListener(new KeyInputHandler());
+		addKeyListener(new KeyInputHandler());
 		
+		// request the focus so key events come to us
+		requestFocus();
+
 		// create the buffering strategy which will allow AWT
 		// to manage our accelerated graphics
 		createBufferStrategy(2);
