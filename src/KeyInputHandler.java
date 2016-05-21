@@ -43,4 +43,20 @@ public class KeyInputHandler extends KeyAdapter {
 				System.exit(0);
 			}
 		}
+		
+		public boolean isLeftPressed() {
+			return left_pressed;
+		}
+		
+		public boolean isRightPressed() {
+			return right_pressed;
+		}
+		
+		public boolean isUpPressed() {
+			return up_pressed;
+		}
+		
+		public boolean isDownPressed() {
+			return down_pressed;
+		}
 	}

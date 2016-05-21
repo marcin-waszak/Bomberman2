@@ -57,7 +57,7 @@ public class Game extends Canvas {
 	
 	public void gameLoop() {
 		int m_fps;
-		
+
 		while(true)
 		{
 			m_fps = fps.measure();
@@ -69,6 +69,7 @@ public class Game extends Canvas {
 			g.setColor(Color.red);
 			g.drawString("FPS: " + m_fps, 400, 600);
 			
+
 			g.dispose();
 			strategy.show();
 			

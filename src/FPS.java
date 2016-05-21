@@ -1,8 +1,8 @@
 import java.util.concurrent.TimeUnit;
 
 public class FPS {
-	static final int FPS = 60;
-	static final int framesPerMeasurment = 4;
+	static final int FPS = 100;
+	static final int FRAMES_PER_MEASURMENT = 16;
 	
 	private long lastTimeMeasurment;
 	private int measurments;
@@ -21,9 +21,9 @@ public class FPS {
 		fpsAccumulator += 1E9 / (-lastTimeMeasurment + (lastTimeMeasurment = System.nanoTime()));
 		measurments++;
 		
-		if(measurments == framesPerMeasurment)
+		if(measurments == FRAMES_PER_MEASURMENT)
 		{
-			fpsCurrent = fpsAccumulator / framesPerMeasurment;
+			fpsCurrent = fpsAccumulator / FRAMES_PER_MEASURMENT;
 			fpsAccumulator = 0;
 			measurments = 0;
 		}
