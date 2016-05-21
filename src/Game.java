@@ -10,6 +10,8 @@ import javax.swing.JPanel;
 public class Game extends Canvas {	
 	private BufferStrategy strategy;
 	private FPS fps;
+	private Board gameBoard;
+	private Board statusBoard;
 
 	public Game() {
 		// create a frame to contain our game
@@ -52,8 +54,22 @@ public class Game extends Canvas {
 		
 		// initialize the entities in our game so there's something
 		// to see at startup
-//		initEntities();
+		// initEntities();
+		
+		gameBoard = new Board(8, 8, 300, 200);
+		statusBoard = new Board(340, 8, 64, 128);
+		
+		gameBoard.add(new BackgroundEntity(
+				gameBoard.getX(), gameBoard.getY(),
+				gameBoard.getWidth(), gameBoard.getHeight(),
+				Color.green));
+		
+		statusBoard.add(new BackgroundEntity(
+				statusBoard.getX(), statusBoard.getY(),
+				statusBoard.getWidth(), statusBoard.getHeight(),
+				Color.blue));
 	}
+	
 	
 	public void gameLoop() {
 		int m_fps;
@@ -62,15 +78,19 @@ public class Game extends Canvas {
 		{
 			m_fps = fps.measure();
 			
-			Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
-			g.setColor(Color.black);
-			g.fillRect(0, 0, getWidth(), getHeight());
+			Graphics2D g2d = (Graphics2D) strategy.getDrawGraphics();
+			g2d.setColor(Color.black);
+			g2d.fillRect(0, 0, getWidth(), getHeight());
 
-			g.setColor(Color.red);
-			g.drawString("FPS: " + m_fps, 400, 600);
+			g2d.setColor(Color.red);
+			g2d.drawString("FPS: " + m_fps, 400, 600);
+			
+			gameBoard.draw(g2d);
+			statusBoard.draw(g2d);
+			
 			
 
-			g.dispose();
+			g2d.dispose();
 			strategy.show();
 			
 			fps.stabilize();
