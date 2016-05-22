@@ -30,4 +30,8 @@ public class FPS {
 		
 		return (int)fpsCurrent;
 	}
+	
+	public int getValue() {
+		return (int)fpsCurrent;
+	}
 }

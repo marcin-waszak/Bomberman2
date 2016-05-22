@@ -7,7 +7,10 @@ import java.awt.image.BufferStrategy;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-public class Game extends Canvas {	
+public class Game extends Canvas {
+	static final int R_WIDTH = 1024;
+	static final int R_HEIGHT = 720;
+	
 	private BufferStrategy strategy;
 	private FPS fps;
 	private Board gameBoard;
@@ -19,11 +22,11 @@ public class Game extends Canvas {
 		
 		// get hold the content of the frame and set up the resolution of the game
 		JPanel panel = (JPanel) frame.getContentPane();
-		panel.setPreferredSize(new Dimension(800, 600));
+		panel.setPreferredSize(new Dimension(R_WIDTH, R_HEIGHT));
 		panel.setLayout(null);
 		
 		// setup our canvas size and put it into the content of the frame
-		setBounds(0, 0, 800, 600);
+		setBounds(0, 0, R_WIDTH, R_HEIGHT);
 		panel.add(this);
 		
 		// Tell AWT not to bother repainting our canvas since we're
@@ -56,34 +59,36 @@ public class Game extends Canvas {
 		// to see at startup
 		// initEntities();
 		
-		gameBoard = new Board(8, 8, 300, 200);
-		statusBoard = new Board(340, 8, 64, 128);
+		gameBoard = new Board(8, 8, 832, 704);
+		statusBoard = new Board(848, 8, 168, 704);
 		
 		gameBoard.add(new BackgroundEntity(
-				gameBoard.getX(), gameBoard.getY(),
-				gameBoard.getWidth(), gameBoard.getHeight(),
-				Color.green));
+				0, 0, gameBoard.getWidth(), gameBoard.getHeight(),
+				Color.getHSBColor(2/3.f, 0.3f, 1.f)));
 		
 		statusBoard.add(new BackgroundEntity(
-				statusBoard.getX(), statusBoard.getY(),
-				statusBoard.getWidth(), statusBoard.getHeight(),
-				Color.blue));
+				0, 0, statusBoard.getWidth(), statusBoard.getHeight(),
+				Color.getHSBColor(1/3.f, 0.3f, 1.f)));
+		
+		statusBoard.add(new FPSEntity(fps, 0, 10, Color.red));
+	}
+	
+	private void clearScreen(Graphics2D g2d)
+	{
+		g2d.setColor(Color.black);
+		g2d.fillRect(0, 0, getWidth(), getHeight());
 	}
 	
 	
 	public void gameLoop() {
-		int m_fps;
-
 		while(true)
 		{
-			m_fps = fps.measure();
+			fps.measure();
 			
 			Graphics2D g2d = (Graphics2D) strategy.getDrawGraphics();
-			g2d.setColor(Color.black);
-			g2d.fillRect(0, 0, getWidth(), getHeight());
+			clearScreen(g2d);
 
-			g2d.setColor(Color.red);
-			g2d.drawString("FPS: " + m_fps, 400, 600);
+			
 			
 			gameBoard.draw(g2d);
 			statusBoard.draw(g2d);
