@@ -1,27 +1,74 @@
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
 
 public class PlayerEntity extends Entity {
+	static final int PLAYER_SPEED = 400;
+
 	public PlayerEntity(double x, double y) {
 		super(x, y);
 		// TODO Auto-generated constructor stub
 	}
-	
+
 	void tick(Game game) {
 		KeyInputHandler keyHandler = game.getKeyInputHandler();
-		double speed = 4.0;
+		double step = PLAYER_SPEED * game.getFPSHandler().getFrameTime();
+		double dx = 0;
+		double dy = 0;		
 
 		if(keyHandler.isUpPressed())
-			move(0.0, -speed);
-		
+			dy -= step;
+
 		if(keyHandler.isDownPressed())
-			move(0.0, speed);
-	
+			dy += step;
+
 		if(keyHandler.isLeftPressed())
-			move(-speed, 0.0);
-		
+			dx -= step;
+
 		if(keyHandler.isRightPressed())
-			move(speed, 0.0);
+			dx += step;
+
+		if(x + dx < 0)
+			dx = 0;
+
+		if(y + dy < 0)
+			dy = 0;
+
+		if(x+48 + dx > board.getWidth())
+			dx = 0;
+
+		if(y+48 + dy > board.getHeight())
+			dy = 0;
+
+		for(Entity entity : board.entities) {
+			if(entity == this)
+				continue;
+			if(entity instanceof BackgroundEntity)
+				continue;
+
+			Rectangle2D.Double r_player;
+			Rectangle2D.Double r_brick;
+			
+			r_player = new Rectangle2D.Double(x, y, 48, 48);
+			if(entity instanceof PlayerEntity)
+				r_brick = new Rectangle2D.Double(entity.x, entity.y, 48, 48);
+			else
+				r_brick = new Rectangle2D.Double(entity.x, entity.y, 64, 64);
+
+			r_player.x += dx;
+			if(r_player.intersects(r_brick)) {
+				r_player.x -= dx;
+				dx = 0;
+			}
+
+			r_player.y += dy;
+			if(r_player.intersects(r_brick)) {
+				r_player.y -= dy;
+				dy = 0;
+			}
+		}
+
+		move(dx, dy);
 	}
 
 	@Override

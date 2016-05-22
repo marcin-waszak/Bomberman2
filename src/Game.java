@@ -84,7 +84,7 @@ public class Game extends Canvas {
 				gameBoard.add(new BrickEntity(
 					64 + 128*i, 64 + 128*k, spriteStore, "sprites/brick.png"));
 		
-		gameBoard.add(new PlayerEntity(0, 0));
+		gameBoard.add(new PlayerEntity(4, 4));
 	}
 	
 	private void doLogic() {
@@ -111,14 +111,17 @@ public class Game extends Canvas {
 		return keyInputHandler;
 	}
 	
+	public FPS getFPSHandler() {
+		return fps;
+	}
 	
 	public void gameLoop() {
 		while(true)
 		{
-			fps.measure();			
+			fps.measure();	
 			Graphics2D g2d = (Graphics2D)strategy.getDrawGraphics();
 			
-			doLogic();			
+			doLogic();
 			clear(g2d);
 			draw(g2d);
 			

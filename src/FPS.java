@@ -8,6 +8,7 @@ public class FPS {
 	private int measurments;
 	private double fpsAccumulator;
 	private double fpsCurrent;
+	private long delta;
 	
 	public void stabilize() {
 		try {
@@ -18,11 +19,11 @@ public class FPS {
 	}
 	
 	public int measure() {
-		fpsAccumulator += 1E9 / (-lastTimeMeasurment + (lastTimeMeasurment = System.nanoTime()));
+		delta = -lastTimeMeasurment + (lastTimeMeasurment = System.nanoTime());
+		fpsAccumulator += 1E9 / (delta);
 		measurments++;
 		
-		if(measurments == FRAMES_PER_MEASURMENT)
-		{
+		if(measurments == FRAMES_PER_MEASURMENT) {
 			fpsCurrent = fpsAccumulator / FRAMES_PER_MEASURMENT;
 			fpsAccumulator = 0;
 			measurments = 0;
@@ -33,5 +34,9 @@ public class FPS {
 	
 	public int getValue() {
 		return (int)fpsCurrent;
+	}
+	
+	public double getFrameTime() {
+		return delta / 1E9;
 	}
 }
