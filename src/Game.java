@@ -13,6 +13,7 @@ public class Game extends Canvas {
 	
 	private BufferStrategy strategy;
 	private FPS fps;
+	private SpriteStore spriteStore;
 	private Board gameBoard;
 	private Board statusBoard;
 
@@ -59,6 +60,7 @@ public class Game extends Canvas {
 		// to see at startup
 		// initEntities();
 		
+		spriteStore = new SpriteStore();
 		gameBoard = new Board(8, 8, 832, 704);
 		statusBoard = new Board(848, 8, 168, 704);
 		
@@ -71,12 +73,23 @@ public class Game extends Canvas {
 				Color.getHSBColor(1/3.f, 0.3f, 1.f)));
 		
 		statusBoard.add(new FPSEntity(fps, 0, 10, Color.red));
+		
+		gameBoard.add(new BrickEntity(0, 0, spriteStore, "sprites/brick.png"));
 	}
 	
-	private void clearScreen(Graphics2D g2d)
+	private void clear(Graphics2D g2d)
 	{
 		g2d.setColor(Color.black);
 		g2d.fillRect(0, 0, getWidth(), getHeight());
+	}
+	
+	private void draw(Graphics2D g2d)
+	{
+		gameBoard.draw(g2d);
+		statusBoard.draw(g2d);
+
+		g2d.dispose();
+		strategy.show();
 	}
 	
 	
@@ -85,18 +98,10 @@ public class Game extends Canvas {
 		{
 			fps.measure();
 			
-			Graphics2D g2d = (Graphics2D) strategy.getDrawGraphics();
-			clearScreen(g2d);
-
+			Graphics2D g2d = (Graphics2D)strategy.getDrawGraphics();
 			
-			
-			gameBoard.draw(g2d);
-			statusBoard.draw(g2d);
-			
-			
-
-			g2d.dispose();
-			strategy.show();
+			clear(g2d);
+			draw(g2d);
 			
 			fps.stabilize();
 		}

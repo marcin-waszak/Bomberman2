@@ -38,5 +38,9 @@ public abstract class Entity {
 		return (int)y + offsetY;
 	}
 	
+	void doLogic() {
+		
+	}
+	
 	abstract void draw(Graphics2D g2d);
 }
