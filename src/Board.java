@@ -36,5 +36,9 @@ public class Board {
 	public int getHeight() {
 		return rectangle.height;
 	}
+	
+	public ArrayList<Entity> getEntities() {
+		return entities;
+	}
 
 }

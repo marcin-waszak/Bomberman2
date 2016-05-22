@@ -3,7 +3,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.image.BufferStrategy;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -11,6 +10,7 @@ public class Game extends Canvas {
 	static final int R_WIDTH = 1024;
 	static final int R_HEIGHT = 720;
 	
+	private KeyInputHandler keyInputHandler;
 	private BufferStrategy strategy;
 	private FPS fps;
 	private SpriteStore spriteStore;
@@ -43,7 +43,8 @@ public class Game extends Canvas {
 		
 		// add a key input system (defined below) to our canvas
 		// so we can respond to key pressed
-		addKeyListener(new KeyInputHandler());
+		keyInputHandler = new KeyInputHandler();
+		addKeyListener(keyInputHandler);
 		
 		// request the focus so key events come to us
 		requestFocus();
@@ -64,6 +65,10 @@ public class Game extends Canvas {
 		gameBoard = new Board(8, 8, 832, 704);
 		statusBoard = new Board(848, 8, 168, 704);
 		
+		initEntities();
+	}
+	
+	private void initEntities() {
 		gameBoard.add(new BackgroundEntity(
 				0, 0, gameBoard.getWidth(), gameBoard.getHeight(),
 				Color.getHSBColor(2/3.f, 0.3f, 1.f)));
@@ -74,7 +79,17 @@ public class Game extends Canvas {
 		
 		statusBoard.add(new FPSEntity(fps, 0, 10, Color.red));
 		
-		gameBoard.add(new BrickEntity(0, 0, spriteStore, "sprites/brick.png"));
+		for(int i = 0; i < 6; i++)
+			for(int k = 0; k < 5; k++) 
+				gameBoard.add(new BrickEntity(
+					64 + 128*i, 64 + 128*k, spriteStore, "sprites/brick.png"));
+		
+		gameBoard.add(new PlayerEntity(0, 0));
+	}
+	
+	private void doLogic() {
+		for(Entity entity : gameBoard.getEntities())
+			entity.tick(this);
 	}
 	
 	private void clear(Graphics2D g2d)
@@ -92,14 +107,18 @@ public class Game extends Canvas {
 		strategy.show();
 	}
 	
+	public KeyInputHandler getKeyInputHandler() {
+		return keyInputHandler;
+	}
+	
 	
 	public void gameLoop() {
 		while(true)
 		{
-			fps.measure();
-			
+			fps.measure();			
 			Graphics2D g2d = (Graphics2D)strategy.getDrawGraphics();
 			
+			doLogic();			
 			clear(g2d);
 			draw(g2d);
 			

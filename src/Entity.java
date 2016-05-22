@@ -38,7 +38,7 @@ public abstract class Entity {
 		return (int)y + offsetY;
 	}
 	
-	void doLogic() {
+	void tick(Game game) {
 		
 	}
 	
