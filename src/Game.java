@@ -3,6 +3,9 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.image.BufferStrategy;
+import java.io.EOFException;
+import java.io.IOException;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -16,9 +19,17 @@ public class Game extends Canvas {
 	private SpriteStore spriteStore;
 	private Board gameBoard;
 	private Board statusBoard;
-
+	private Multiplayer multiplayer;
+	private MessageListener messageListener;
+	//multiplayer test//////////
+	public PlayerEntity enemy;
+	//////////////////////////////
 	public Game() {
 		// create a frame to contain our game
+		multiplayer = new Multiplayer();
+		messageListener = new MessageListener(this, multiplayer);
+		new Thread(messageListener).start();
+		
 		JFrame frame = new JFrame("Bomberman 2");
 		
 		// get hold the content of the frame and set up the resolution of the game
@@ -62,8 +73,8 @@ public class Game extends Canvas {
 		// initEntities();
 		
 		spriteStore = new SpriteStore();
-		gameBoard = new Board(8, 8, 832, 704);
-		statusBoard = new Board(848, 8, 168, 704);
+		gameBoard = new Board(8, 8, 832, 704, multiplayer);
+		statusBoard = new Board(848, 8, 168, 704, multiplayer);
 		
 		initEntities();
 	}
@@ -83,8 +94,24 @@ public class Game extends Canvas {
 			for(int k = 0; k < 5; k++) 
 				gameBoard.add(new BrickEntity(
 					64 + 128*i, 64 + 128*k, spriteStore, "sprites/brick.png"));
+		///Multiplayer test///////////////////////////////////
+		if(multiplayer.getIs_server() == true) {
+			gameBoard.add(new PlayerEntity(4, 4, false));
+			enemy = new PlayerEntity(770, 640, true);
+		} else {
+			gameBoard.add(new PlayerEntity(770, 640, false));
+			enemy = new PlayerEntity(4, 4, true);
+		}
 		
-		gameBoard.add(new PlayerEntity(4, 4));
+		gameBoard.add(enemy);
+		//Fuckfix Wyscigi......
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		///////////////////////////////////////////////////////////
 	}
 	
 	private void doLogic() {

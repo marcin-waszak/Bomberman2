@@ -5,10 +5,12 @@ import java.util.ArrayList;
 public class Board {
 	protected Rectangle rectangle;
 	protected ArrayList<Entity> entities;
+	public Multiplayer multiplayer;
 	
-	public Board(int x, int y, int width, int height) {
+	public Board(int x, int y, int width, int height, Multiplayer multiplayer) {
 		rectangle = new Rectangle(x, y, width, height);
 		entities = new ArrayList<Entity>();
+		this.multiplayer = multiplayer;
 	}
 	
 	public void add(Entity entity) {
