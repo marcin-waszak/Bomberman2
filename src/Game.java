@@ -101,17 +101,9 @@ public class Game extends Canvas {
 		} else {
 			gameBoard.add(new PlayerEntity(770, 640, false));
 			enemy = new PlayerEntity(4, 4, true);
-		}
-		
+		}		
 		gameBoard.add(enemy);
-		//Fuckfix Wyscigi......
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		///////////////////////////////////////////////////////////
+		messageListener.releaseSempahore();
 	}
 	
 	private void doLogic() {
