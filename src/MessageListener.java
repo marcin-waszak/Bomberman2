@@ -18,12 +18,12 @@ public class  MessageListener implements Runnable {
 	public void run() {
 		double i;
 		double k;
-	/*	try {
+		try {
 			semaphore.acquire();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}*/
+		}
 		while(true) {
 			
 			while((i = multiplayer.readmsg()) != -1) {
