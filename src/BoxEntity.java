@@ -1,10 +1,10 @@
 import java.awt.Graphics2D;
 
-public class BrickEntity extends Entity {
-	private SpriteStore spriteStore;
-	private Sprite sprite;
+public class BoxEntity extends Entity {
+	SpriteStore spriteStore;
+	Sprite sprite;
 
-	public BrickEntity(double x, double y, SpriteStore spriteStore, String path) {
+	public BoxEntity(double x, double y, SpriteStore spriteStore, String path) {
 		super(x, y);
 		this.spriteStore = spriteStore;
 		this.sprite = spriteStore.getSprite(path);

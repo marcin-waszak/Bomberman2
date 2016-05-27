@@ -4,13 +4,17 @@ import java.awt.geom.Rectangle2D;
 
 public class PlayerEntity extends Entity {
 	static final int PLAYER_SPEED = 400;
+	long lastPlantedDynamite;
+	long plantDynamiteInterval = 200;
+	int numberOfDynamites = 1;
 
 	public PlayerEntity(double x, double y) {
 		super(x, y);
-		// TODO Auto-generated constructor stub
+//		board.
 	}
 
-	void tick(Game game) {
+	public void tick(Game game) {
+		// Movement
 		KeyInputHandler keyHandler = game.getKeyInputHandler();
 		double step = PLAYER_SPEED * game.getFPSHandler().getFrameTime();
 		double dx = 0;
@@ -44,6 +48,8 @@ public class PlayerEntity extends Entity {
 			if(entity == this)
 				continue;
 			if(entity instanceof BackgroundEntity)
+				continue;			
+			if(entity instanceof DynamiteEntity)
 				continue;
 
 			Rectangle2D.Double r_player;
@@ -69,10 +75,27 @@ public class PlayerEntity extends Entity {
 		}
 
 		move(dx, dy);
+		
+		// Plant the dynamite
+		
+		if(keyHandler.isSpacePressed())
+			TryPlantDynamite(game);
 	}
 
+	private void TryPlantDynamite(Game game) {
+		if(System.currentTimeMillis() - lastPlantedDynamite < plantDynamiteInterval)
+			return;
+		
+		if(numberOfDynamites < 1)
+			return;
+		
+		lastPlantedDynamite = System.currentTimeMillis();
+		game.PlantDynamite(this);
+		
+	}
+	
 	@Override
-	void draw(Graphics2D g2d) {
+	public void draw(Graphics2D g2d) {
 		g2d.setColor(Color.red);
 		g2d.fillRect(getActualX(), getActualY(), 48, 48);
 	}

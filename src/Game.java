@@ -2,7 +2,9 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.image.BufferStrategy;
+import java.util.Random;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -10,11 +12,12 @@ public class Game extends Canvas {
 	static final int R_WIDTH = 1024;
 	static final int R_HEIGHT = 720;
 	
+	private Random random;
 	private KeyInputHandler keyInputHandler;
 	private BufferStrategy strategy;
 	private FPS fps;
 	private SpriteStore spriteStore;
-	private Board gameBoard;
+	private GameBoard gameBoard;
 	private Board statusBoard;
 
 	public Game() {
@@ -41,6 +44,7 @@ public class Game extends Canvas {
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
+		random = new Random();
 		// add a key input system (defined below) to our canvas
 		// so we can respond to key pressed
 		keyInputHandler = new KeyInputHandler();
@@ -62,7 +66,7 @@ public class Game extends Canvas {
 		// initEntities();
 		
 		spriteStore = new SpriteStore();
-		gameBoard = new Board(8, 8, 832, 704);
+		gameBoard = new GameBoard(8, 8, 832, 704);
 		statusBoard = new Board(848, 8, 168, 704);
 		
 		initEntities();
@@ -79,17 +83,28 @@ public class Game extends Canvas {
 		
 		statusBoard.add(new FPSEntity(fps, 0, 10, Color.red));
 		
+		gameBoard.add(new PlayerEntity(0, 0));
+		
 		for(int i = 0; i < 6; i++)
 			for(int k = 0; k < 5; k++) 
-				gameBoard.add(new BrickEntity(
-					64 + 128*i, 64 + 128*k, spriteStore, "sprites/brick.png"));
+				gameBoard.add(new BrickEntity(64*(1+2*i), 64*(1+2*k), spriteStore, "sprites/brick.png"));
 		
-		gameBoard.add(new PlayerEntity(4, 4));
+		for(int i = 0; i < 23; i++) {
+			int kx = random.nextInt((12 - 0) + 1) + 0;
+			int ky = random.nextInt((10 - 0) + 1) + 0;
+			
+			if(!gameBoard.add(new BoxEntity(64*kx, 64*ky, spriteStore, "sprites/box.png"))) {
+				i--;
+				continue;
+			}
+		}
 	}
 	
-	private void doLogic() {
+	private void doLogic() {		
 		for(Entity entity : gameBoard.getEntities())
 			entity.tick(this);
+		
+		gameBoard.tick();
 	}
 	
 	private void clear(Graphics2D g2d)
@@ -129,7 +144,10 @@ public class Game extends Canvas {
 		}
 	}
 	
-
+	public void PlantDynamite(PlayerEntity player) {		
+		Point gPoint = gameBoard.getGridPixel(player.getActualX(), player.getActualY());
+		gameBoard.toAdd(new DynamiteEntity(gPoint.x, gPoint.y, spriteStore, "sprites/dynamite.png"));
+	}
 
 	public static void main(String[] args) {
 		Game game = new Game();

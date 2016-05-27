@@ -6,7 +6,7 @@ public abstract class Entity {
 	protected Board board;
 	protected int offsetX;
 	protected int offsetY;
-
+	
 	public Entity(double x, double y) {
 		setPosition(x, y);
 		board = null;
@@ -28,6 +28,14 @@ public abstract class Entity {
 	public void move(double dx, double dy) {
 		this.x += dx;
 		this.y += dy;
+	}
+	
+	protected double getX() {
+		return x;
+	}
+	
+	protected double getY() {
+		return y;
 	}
 	
 	protected int getActualX() {
