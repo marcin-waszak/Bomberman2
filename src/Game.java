@@ -1,8 +1,10 @@
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.image.BufferStrategy;
 import java.util.Random;
 import javax.swing.JFrame;
@@ -19,7 +21,9 @@ public class Game extends Canvas {
 	private SpriteStore spriteStore;
 	private GameBoard gameBoard;
 	private Board statusBoard;
+	private PlayerEntity localPlayer;
 	private TextEntity fpsText;
+	private TextEntity dynamitesText;
 
 	public Game() {
 		// create a frame to contain our game
@@ -62,8 +66,6 @@ public class Game extends Canvas {
 		// make FPS handler
 		fps = new FPS();
 		
-		fpsText = new TextEntity(0, 10, Color.red, "FPS: 0");
-		
 		// initialize the entities in our game so there's something
 		// to see at startup
 		// initEntities();
@@ -84,9 +86,14 @@ public class Game extends Canvas {
 				0, 0, statusBoard.getWidth(), statusBoard.getHeight(),
 				Color.getHSBColor(1/3.f, 0.3f, 1.f)));
 		
+		fpsText = new TextEntity(0, 10, "FPS: 0");
+		dynamitesText = new TextEntity(0, 24, "Dynamites: 0");
+
 		statusBoard.add(fpsText);
+		statusBoard.add(dynamitesText);
 		
-		gameBoard.add(new PlayerEntity(0, 0));
+		localPlayer = new PlayerEntity(0, 0);
+		gameBoard.add(localPlayer);
 		
 		for(int i = 0; i < 6; i++)
 			for(int k = 0; k < 5; k++) 
@@ -103,11 +110,19 @@ public class Game extends Canvas {
 		}
 	}
 	
+	private Graphics2D initGraphics() {
+		Graphics2D g2d = (Graphics2D)strategy.getDrawGraphics();
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		
+		return g2d;
+	}
+	
 	private void doLogic() {		
 		for(Entity entity : gameBoard.getEntities())
 			entity.tick(this);
 		
 		fpsText.setText("FPS: " + fps.getValue());
+		dynamitesText.setText("Dynamites: " + localPlayer.getDynamitesCount());
 		
 		gameBoard.tick();
 	}
@@ -136,12 +151,14 @@ public class Game extends Canvas {
 	}
 	
 	public void gameLoop() {
+		Graphics2D g2d;
+		
 		while(true)
 		{
 			fps.measure();	
-			Graphics2D g2d = (Graphics2D)strategy.getDrawGraphics();
 			
-			doLogic();
+			doLogic();			
+			g2d = initGraphics();			
 			clear(g2d);
 			draw(g2d);
 			
