@@ -33,6 +33,9 @@ public class Board {
 		entities.removeAll(to_remove);
 		entities.addAll(to_add);
 		
+		for(Entity entity :  to_add)
+			entity.setBoard(this);
+		
 		to_remove.clear();
 		to_add.clear();
 	}

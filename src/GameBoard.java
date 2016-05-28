@@ -35,8 +35,7 @@ public class GameBoard extends Board {
 	}
 	
 	public Point getGridPixel(double x, double y) {
-		return new Point(
-				rectangle.x + 64*(int)(x/64.0), rectangle.y + 64*(int)(y/64.0));
+		return new Point(64*(int)(x/64.0), 64*(int)(y/64.0));
 	}
 
 }
