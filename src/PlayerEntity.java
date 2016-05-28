@@ -3,14 +3,13 @@ import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 
 public class PlayerEntity extends Entity {
-	static final int PLAYER_SPEED = 400;
-	long lastPlantedDynamite;
-	long plantDynamiteInterval = 200;
-	int numberOfDynamites = 1;
+	private static final int PLAYER_SPEED = 400;
+	private long lastPlantedDynamite;
+	private long plantDynamiteInterval = 500;
+	private int numberOfDynamites = 3;
 
 	public PlayerEntity(double x, double y) {
 		super(x, y);
-//		board.
 	}
 
 	public void tick(Game game) {
@@ -91,7 +90,11 @@ public class PlayerEntity extends Entity {
 		
 		lastPlantedDynamite = System.currentTimeMillis();
 		game.PlantDynamite(this);
-		
+		numberOfDynamites--;		
+	}
+	
+	public void gainDynamite() {
+		numberOfDynamites++;
 	}
 	
 	@Override

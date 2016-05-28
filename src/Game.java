@@ -146,7 +146,13 @@ public class Game extends Canvas {
 	
 	public void PlantDynamite(PlayerEntity player) {		
 		Point gPoint = gameBoard.getGridPixel(player.getActualX(), player.getActualY());
-		gameBoard.toAdd(new DynamiteEntity(gPoint.x, gPoint.y, spriteStore, "sprites/dynamite.png"));
+		gameBoard.toAdd(new DynamiteEntity(gPoint.x, gPoint.y,
+				spriteStore, "sprites/dynamite.png", player));
+	}
+	
+	public void explodeDynamite(DynamiteEntity entity) {
+		gameBoard.toRemove(entity);
+		entity.getOwner().gainDynamite();
 	}
 
 	public static void main(String[] args) {
