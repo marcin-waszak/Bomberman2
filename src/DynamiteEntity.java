@@ -12,8 +12,7 @@ public class DynamiteEntity extends Entity {
 		super(x, y);
 		this.spriteStore = spriteStore;
 		this.sprite = spriteStore.getSprite(path);
-		this.owner = owner;
-		
+		this.owner = owner;	
 		plantTime = System.currentTimeMillis();
 	}
 	

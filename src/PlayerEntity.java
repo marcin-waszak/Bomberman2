@@ -5,7 +5,7 @@ import java.awt.geom.Rectangle2D;
 public class PlayerEntity extends Entity {
 	private static final int PLAYER_SPEED = 400;
 	private long lastPlantedDynamite;
-	private long plantDynamiteInterval = 500;
+	private long plantDynamiteInterval = 400;
 	private int numberOfDynamites = 3;
 
 	public PlayerEntity(double x, double y) {
@@ -50,6 +50,8 @@ public class PlayerEntity extends Entity {
 				continue;			
 			if(entity instanceof DynamiteEntity)
 				continue;
+			if(entity instanceof BeamEntity)
+				continue;
 
 			Rectangle2D.Double r_player;
 			Rectangle2D.Double r_brick;
@@ -89,12 +91,15 @@ public class PlayerEntity extends Entity {
 			return;
 		
 		lastPlantedDynamite = System.currentTimeMillis();
-		game.PlantDynamite(this);
-		numberOfDynamites--;		
+		game.PlantDynamite(this);	
 	}
 	
-	public void gainDynamite() {
+	public void increaseDynamite() {
 		numberOfDynamites++;
+	}
+	
+	public void decreaseDynamite() {
+		numberOfDynamites--;
 	}
 	
 	public int getDynamitesCount() {

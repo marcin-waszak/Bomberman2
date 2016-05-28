@@ -16,25 +16,36 @@ public class Board {
 	}
 	
 	public boolean add(Entity entity) {
+		if(entity.getX() < 0)
+			return false;
+		
+		if(entity.getY() < 0)
+			return false;
+		
+		if(entity.getX() >= getWidth())
+			return false;
+		
+		if(entity.getY() >= getHeight())
+			return false;
+		
 		entity.setBoard(this);
-		entities.add(entity);
+		
+		to_add.add(entity);
 		return true;
 	}
 	
-	public void toAdd(Entity entity) {
-		to_add.add(entity);
+	public boolean remove(Entity entity) {
+		to_remove.add(entity);
+		return true;
 	}
 	
-	public void toRemove(Entity entity) {
-		to_remove.add(entity);
+	public int entitiesCount() {
+		return entities.size();
 	}
 	
 	public void tick() {
 		entities.removeAll(to_remove);
 		entities.addAll(to_add);
-		
-		for(Entity entity :  to_add)
-			entity.setBoard(this);
 		
 		to_remove.clear();
 		to_add.clear();

@@ -23,7 +23,8 @@ public class Game extends Canvas {
 	private Board statusBoard;
 	private PlayerEntity localPlayer;
 	private TextEntity fpsText;
-	private TextEntity dynamitesText;
+	private TextEntity dynamitesText;	
+	private TextEntity entitiesText;
 
 	public Game() {
 		// create a frame to contain our game
@@ -80,7 +81,7 @@ public class Game extends Canvas {
 	private void initEntities() {
 		gameBoard.add(new BackgroundEntity(
 				0, 0, gameBoard.getWidth(), gameBoard.getHeight(),
-				Color.getHSBColor(2/3.f, 0.3f, 1.f)));
+				Color.getHSBColor(2/3.f, 0.3f, .1f)));
 		
 		statusBoard.add(new BackgroundEntity(
 				0, 0, statusBoard.getWidth(), statusBoard.getHeight(),
@@ -88,9 +89,11 @@ public class Game extends Canvas {
 		
 		fpsText = new TextEntity(0, 10, "FPS: 0");
 		dynamitesText = new TextEntity(0, 24, "Dynamites: 0");
+		entitiesText = new TextEntity(0, 38, "Entities: 0");
 
 		statusBoard.add(fpsText);
 		statusBoard.add(dynamitesText);
+		statusBoard.add(entitiesText);
 		
 		localPlayer = new PlayerEntity(0, 0);
 		gameBoard.add(localPlayer);
@@ -103,7 +106,8 @@ public class Game extends Canvas {
 			int kx = random.nextInt((12 - 0) + 1) + 0;
 			int ky = random.nextInt((10 - 0) + 1) + 0;
 			
-			if(!gameBoard.add(new BoxEntity(64*kx, 64*ky, spriteStore, "sprites/box.png"))) {
+			if(isSpawnPoint(kx, ky) || !gameBoard.add(new BoxEntity(64*kx, 64*ky,
+					spriteStore, "sprites/box.png")))  {
 				i--;
 				continue;
 			}
@@ -123,7 +127,9 @@ public class Game extends Canvas {
 		
 		fpsText.setText("FPS: " + fps.getValue());
 		dynamitesText.setText("Dynamites: " + localPlayer.getDynamitesCount());
+		entitiesText.setText("Entities: " + gameBoard.entitiesCount());
 		
+		statusBoard.tick();
 		gameBoard.tick();
 	}
 	
@@ -150,6 +156,44 @@ public class Game extends Canvas {
 		return fps;
 	}
 	
+	private boolean isSpawnPoint(int gx, int gy) {
+		if(gx == 0 && gy == 0)
+			return true;
+		if(gx == 0 && gy == 1)
+			return true;
+		if(gx == 1 && gy == 0)
+			return true;
+		if(gx == 12 && gy == 10)
+			return true;
+		if(gx == 11 && gy == 10)
+			return true;
+		if(gx == 12 && gy == 9)
+			return true;
+		
+		return false;
+	}
+	
+	public void PlantDynamite(PlayerEntity player) {		
+		Point gPoint = gameBoard.getGridPixel(24+player.getX(), 24+player.getY());
+		if(gameBoard.add(new DynamiteEntity(gPoint.x, gPoint.y,
+				spriteStore, "sprites/dynamite.png", player)))
+			player.decreaseDynamite();
+	}
+	
+	public void explodeDynamite(DynamiteEntity dynamite) {
+		gameBoard.remove(dynamite);
+		dynamite.getOwner().increaseDynamite();
+		
+		BeamEntity beam = new BeamEntity(dynamite.getX(), dynamite.getY(),
+				spriteStore, "sprites/beam.png", dynamite.getOwner());
+		
+		gameBoard.add(beam);
+	}
+	
+	public void finishBeam(BeamEntity beam) {
+		gameBoard.remove(beam);
+	}
+	
 	public void gameLoop() {
 		Graphics2D g2d;
 		
@@ -165,24 +209,10 @@ public class Game extends Canvas {
 			fps.stabilize();
 		}
 	}
-	
-	public void PlantDynamite(PlayerEntity player) {		
-		Point gPoint = gameBoard.getGridPixel(player.getActualX(), player.getActualY());
-		gameBoard.toAdd(new DynamiteEntity(gPoint.x, gPoint.y,
-				spriteStore, "sprites/dynamite.png", player));
-	}
-	
-	public void explodeDynamite(DynamiteEntity entity) {
-		gameBoard.toRemove(entity);
-		entity.getOwner().gainDynamite();
-	}
 
 	public static void main(String[] args) {
 		Game game = new Game();
-
-		// Start the main game loop, note: this method will not
-		// return until the game has finished running. Hence we are
-		// using the actual main thread to run the game.
+		
 		game.gameLoop();
 
 	}

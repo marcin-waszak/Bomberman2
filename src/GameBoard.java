@@ -10,22 +10,41 @@ public class GameBoard extends Board {
 		for(int i = 0; i < 13; i++)
 			for(int k = 0; k < 11; k++)
 				grid[i][k] = 0;
-		
-		grid[0][1] = 1;
-		grid[1][0] = 1;
 	}
 	
 	public boolean add(Entity entity) {
 		Point gp = getGrid(entity.getX(), entity.getY());
 		
+		if(entity.getX() < 0)
+			return false;
+		
+		if(entity.getY() < 0)
+			return false;
+		
+		if(entity.getX() >= getWidth())
+			return false;
+		
+		if(entity.getY() >= getHeight())
+			return false;
+		
 		if(grid[gp.x][gp.y] != 0) 
 			return false;
 		
 		entity.setBoard(this);
-		entities.add(entity);
+		to_add.add(entity);
 		
-		if(!(entity instanceof BackgroundEntity))
+		if(!(entity instanceof BackgroundEntity)
+				&& !(entity instanceof PlayerEntity))
 			grid[gp.x][gp.y] = 1;
+		
+		return true;
+	}
+	
+	public boolean remove(Entity entity) {
+		Point gp = getGrid(entity.getX(), entity.getY());
+		
+		to_remove.add(entity);		
+		grid[gp.x][gp.y] = 0;
 		
 		return true;
 	}
