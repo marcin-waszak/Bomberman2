@@ -19,6 +19,7 @@ public class Game extends Canvas {
 	private SpriteStore spriteStore;
 	private GameBoard gameBoard;
 	private Board statusBoard;
+	private TextEntity fpsText;
 
 	public Game() {
 		// create a frame to contain our game
@@ -61,6 +62,8 @@ public class Game extends Canvas {
 		// make FPS handler
 		fps = new FPS();
 		
+		fpsText = new TextEntity(0, 10, Color.red, "FPS: 0");
+		
 		// initialize the entities in our game so there's something
 		// to see at startup
 		// initEntities();
@@ -81,7 +84,7 @@ public class Game extends Canvas {
 				0, 0, statusBoard.getWidth(), statusBoard.getHeight(),
 				Color.getHSBColor(1/3.f, 0.3f, 1.f)));
 		
-		statusBoard.add(new FPSEntity(fps, 0, 10, Color.red));
+		statusBoard.add(fpsText);
 		
 		gameBoard.add(new PlayerEntity(0, 0));
 		
@@ -103,6 +106,8 @@ public class Game extends Canvas {
 	private void doLogic() {		
 		for(Entity entity : gameBoard.getEntities())
 			entity.tick(this);
+		
+		fpsText.setText("FPS: " + fps.getValue());
 		
 		gameBoard.tick();
 	}
@@ -126,7 +131,7 @@ public class Game extends Canvas {
 		return keyInputHandler;
 	}
 	
-	public FPS getFPSHandler() {
+	public FPS getFPSHandler() { //TODO
 		return fps;
 	}
 	

@@ -15,7 +15,7 @@ public class PlayerEntity extends Entity {
 	public void tick(Game game) {
 		// Movement
 		KeyInputHandler keyHandler = game.getKeyInputHandler();
-		double step = PLAYER_SPEED * game.getFPSHandler().getFrameTime();
+		double step = PLAYER_SPEED * game.getFPSHandler().getFrameTime(); //TODO
 		double dx = 0;
 		double dy = 0;		
 
@@ -95,6 +95,10 @@ public class PlayerEntity extends Entity {
 	
 	public void gainDynamite() {
 		numberOfDynamites++;
+	}
+	
+	public int getDynamitesCount() {
+		return numberOfDynamites;
 	}
 	
 	@Override
