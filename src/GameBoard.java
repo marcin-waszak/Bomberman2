@@ -33,9 +33,9 @@ public class GameBoard extends Board {
 		entity.setBoard(this);
 		to_add.add(entity);
 		
-		if(!(entity instanceof BackgroundEntity)
-				&& !(entity instanceof PlayerEntity))
-			grid[gp.x][gp.y] = 1;
+//		if(!(entity instanceof BackgroundEntity)
+//				&& !(entity instanceof PlayerEntity))
+//			grid[gp.x][gp.y] = 1;
 		
 		return true;
 	}

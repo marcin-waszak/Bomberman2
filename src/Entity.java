@@ -53,7 +53,13 @@ public abstract class Entity {
 		return rectangle;
 	}
 	
-	void tick(Game game) {
+	public boolean collidesWith(Entity entity) {
+		if(rectangle.intersects(entity.getRectangle()))
+			return true;
+		return false;
+	}
+	
+	public void tick(Game game) {
 		
 	}
 	

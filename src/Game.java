@@ -117,13 +117,31 @@ public class Game extends Canvas {
 		return g2d;
 	}
 	
+	private void updateTexts() {
+		fpsText.setText("FPS: " + fps.getValue());
+		dynamitesText.setText("Dynamites: " + localPlayer.getDynamitesCount());
+		entitiesText.setText("Entities: " + gameBoard.entitiesCount());
+	}
+	
+	private void handleBeamCollisions() {
+		for(Entity entity : gameBoard.getEntities())
+			if(entity instanceof BeamEntity)
+				for(Entity anotherEntity : gameBoard.getEntities()) {
+					if(entity.collidesWith(anotherEntity)) {
+						if(anotherEntity instanceof PlayerEntity)
+							gameBoard.remove(anotherEntity);
+						else if(anotherEntity instanceof BoxEntity)
+							gameBoard.remove(anotherEntity);
+					}
+				}
+	}	
+	
 	private void doLogic() {		
 		for(Entity entity : gameBoard.getEntities())
 			entity.tick(this);
 		
-		fpsText.setText("FPS: " + fps.getValue());
-		dynamitesText.setText("Dynamites: " + localPlayer.getDynamitesCount());
-		entitiesText.setText("Entities: " + gameBoard.entitiesCount());
+		updateTexts();
+		handleBeamCollisions();
 		
 		statusBoard.tick();
 		gameBoard.tick();
@@ -167,6 +185,28 @@ public class Game extends Canvas {
 		return false;
 	}
 	
+	private int beamPenetrator(BeamEntity beam, Entity entity) {		
+		if(entity instanceof BackgroundEntity)
+			return 1; // continue
+		
+		if(entity instanceof BeamEntity)
+			return 1;
+		
+		if(!beam.collidesWith(entity))
+			return 1;
+		
+		if(entity instanceof BrickEntity)
+			return 2; // break outerloop		
+		
+		if(entity instanceof BrickEntity)
+			return 2; // break outerloop
+		
+		if(entity instanceof PlayerEntity)
+			return 2;
+		
+		return 0; // do nothing
+	}
+	
 	public void PlantDynamite(PlayerEntity player) {		
 		Point gPoint = gameBoard.getGridPixel(24+player.getX(), 24+player.getY());
 		if(gameBoard.add(new DynamiteEntity(gPoint.x, gPoint.y,
@@ -186,61 +226,64 @@ public class Game extends Canvas {
 			BeamEntity beam = new BeamEntity(dynamite.getX() + i*64, dynamite.getY(),
 					spriteStore, "sprites/beam.png");
 			
-			Rectangle r_beam = beam.getRectangle();
-			
 			gameBoard.add(beam);
-			for(Entity entity : gameBoard.getEntities()) {
-				Rectangle r_another = entity.getRectangle();
-				
-				if(entity instanceof BackgroundEntity)
-					continue;
-				
-				if(entity instanceof BeamEntity)
-					continue;
-				
-				if(!(r_beam.intersects(r_another))) {
-					String className = entity.getClass().getSimpleName();
-					System.out.println(className);
-					continue;
-				}
-				
-				if(entity instanceof BrickEntity) {
-					gameBoard.add(beam);
-					gameBoard.remove(entity);
-					break outerloop;
-				}
-				
-				if(entity instanceof PlayerEntity) {
-					gameBoard.add(beam);
-					gameBoard.remove(localPlayer);
-					break outerloop;
-				}
-				
-			}
 			
+			for(Entity entity : gameBoard.getEntities()) {				
+				switch(beamPenetrator(beam, entity)) {
+					case 1: continue;
+					case 2: break outerloop;
+					default: break;
+				}
+			}
 		}
 		
+		outerloop:
 		for(int i = 1; i <= range; i++) {
 			BeamEntity beam = new BeamEntity(dynamite.getX() - i*64, dynamite.getY(),
 					spriteStore, "sprites/beam.png");
+			
 			gameBoard.add(beam);
+			
+			for(Entity entity : gameBoard.getEntities()) {				
+				switch(beamPenetrator(beam, entity)) {
+					case 1: continue;
+					case 2: break outerloop;
+					default: break;
+				}
+			}
 		}
 		
+		outerloop:
 		for(int i = 1; i <= range; i++) {
 			BeamEntity beam = new BeamEntity(dynamite.getX(), dynamite.getY() + i*64,
 					spriteStore, "sprites/beam.png");
+			
 			gameBoard.add(beam);
+			
+			for(Entity entity : gameBoard.getEntities()) {				
+				switch(beamPenetrator(beam, entity)) {
+					case 1: continue;
+					case 2: break outerloop;
+					default: break;
+				}
+			}
 		}
 		
+		outerloop:
 		for(int i = 1; i <= range; i++) {
 			BeamEntity beam = new BeamEntity(dynamite.getX(), dynamite.getY() - i*64,
 					spriteStore, "sprites/beam.png");
+			
 			gameBoard.add(beam);
+			
+			for(Entity entity : gameBoard.getEntities()) {				
+				switch(beamPenetrator(beam, entity)) {
+					case 1: continue;
+					case 2: break outerloop;
+					default: break;
+				}
+			}
 		}
-
-		
-
-//		gameBoard.add(beam);
 	}
 	
 	public void finishBeam(BeamEntity beam) {

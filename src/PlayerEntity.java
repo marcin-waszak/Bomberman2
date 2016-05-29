@@ -12,10 +12,6 @@ public class PlayerEntity extends Entity {
 
 	public PlayerEntity(double x, double y) {
 		super(x, y);
-		this.rectangle.x = (int)x;
-		this.rectangle.y = (int)y;
-		this.rectangle.width = playerSize;
-		this.rectangle.height = playerSize;
 	}
 
 	public void tick(Game game) {
@@ -87,6 +83,11 @@ public class PlayerEntity extends Entity {
 		
 		if(keyHandler.isSpacePressed())
 			TryPlantDynamite(game);
+		
+		this.rectangle.x = (int)x;
+		this.rectangle.y = (int)y;
+		this.rectangle.width = playerSize;
+		this.rectangle.height = playerSize;
 	}
 
 	private void TryPlantDynamite(Game game) {
