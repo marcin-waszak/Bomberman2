@@ -55,7 +55,7 @@ public class PlayerEntity extends Entity {
 			if(entity instanceof DynamiteEntity &&
 				((DynamiteEntity) entity).getOwner() != entity &&
 					!((DynamiteEntity)entity).isLost())
-						continue;			
+				continue;			
 
 			Rectangle2D.Double r_player;
 			Rectangle2D.Double r_brick;

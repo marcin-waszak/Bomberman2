@@ -145,6 +145,8 @@ public class Game extends Canvas {
 							gameBoard.remove(anotherEntity);
 						else if(anotherEntity instanceof PickupEntity)
 							gameBoard.remove(anotherEntity);
+						else if(anotherEntity instanceof DynamiteEntity)
+							explodeDynamite((DynamiteEntity)anotherEntity);
 					}
 				}
 	}	
