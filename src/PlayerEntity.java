@@ -8,7 +8,7 @@ public class PlayerEntity extends Entity {
 	private long lastPlantedDynamite;
 	private long plantDynamiteInterval = 400;
 	private int numberOfDynamites = 1;
-	private int dynamiteRange = 2;
+	private int dynamiteRange = 1;
 	private Color color;
 	private Multiplayer multiplayer;
 	private boolean remote;	
@@ -90,7 +90,7 @@ public class PlayerEntity extends Entity {
 	
 			move(dx, dy);
 			
-			multiplayer.sendMessage(2 << 0 | (int)x << 8 | (int)y << 16);
+			multiplayer.sendMessage(2 << 0 | (int)x << 4 | (int)y << 16);
 			
 			// Plant the dynamite
 			if(keyHandler.isSpacePressed())
@@ -131,7 +131,7 @@ public class PlayerEntity extends Entity {
 	}
 	
 	public void increaseDynamiteRange() {
-		numberOfDynamites++;
+		dynamiteRange++;
 	}
 	
 	public int getPlayerSize() {

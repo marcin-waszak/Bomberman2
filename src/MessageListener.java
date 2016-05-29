@@ -13,11 +13,16 @@ public class  MessageListener implements Runnable {
 	public void run() {
 		while(true) {
 			int i = multiplayer.readMessage();
-			switch(i & 0x000000FF) {
+			switch(i & 0x0000000F) {
 			case(1):
-				game.notifyAddBox((i & 0x0000FF00) >> 8, (i & 0x00FF0000) >> 16, (i & 0xFF000000) >> 24);
+				game.notifyAddBox((i & 0x0000FFF0) >> 4, (i & 0x0FFF0000) >> 16, (i & 0xF0000000) >> 28);
+				break;
 			case(2):
-				game.notifySetRemotePlayerPosition((i & 0x0000FF00) >> 8, (i & 0x00FF0000) >> 16);
+				game.notifySetRemotePlayerPosition((i & 0x0000FFF0) >> 4, (i & 0x0FFF0000) >> 16);
+				break;
+			case(3):
+				game.notifyRemotePlayerSettingBomb((i & 0x0000FFF0) >> 4, (i & 0x0FFF0000) >> 16);
+				break;
 			case(9):
 				game.notifySemaphoreRelease();
 			}

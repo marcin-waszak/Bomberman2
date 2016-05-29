@@ -134,10 +134,14 @@ public class Game extends Canvas {
 			for(int x = 0; x < 13; x++) {
 				for(int y = 0; y < 11; y++) {
 					if(!isSpawnPoint(x, y) && (random.nextInt(5) <= 3)) {
-						int i = random.nextInt(NUM_OF_DIFFERENT_BONUSES + 1);
-						gameBoard.add(new BoxEntity(64*x, 64*y, spriteStore, "sprites/box.png", i));
-						
-						multiplayer.sendMessage(1 << 0 | x << 8 | y << 16 | i << 24);
+						int i;
+						if(random.nextInt(5) <= 0) {
+							i = random.nextInt(NUM_OF_DIFFERENT_BONUSES) + 1;
+						} else {
+							i = 0;
+						}
+						gameBoard.add(new BoxEntity(64*x, 64*y, spriteStore, "sprites/box.png", i));					
+						multiplayer.sendMessage(1 << 0 | x << 4 | y << 16 | i << 28);
 					}
 					if(x % 2 == 1) {
 						y++;
@@ -172,9 +176,9 @@ public class Game extends Canvas {
 							gameBoard.remove(anotherEntity);
 						else if(anotherEntity instanceof BoxEntity) {
 							gameBoard.remove(anotherEntity);
-							if(random.nextInt(5) == 0) {
+							if(((BoxEntity)anotherEntity).getBonus() > 0) {
 								gameBoard.add(new PickupEntity(anotherEntity.x,
-									anotherEntity.y, spriteStore, "sprites/pickup.png", 1));
+								anotherEntity.y, spriteStore, "sprites/pickup.png", ((BoxEntity) anotherEntity).getBonus()));
 							}
 						}
 						else if(anotherEntity instanceof PickupEntity
@@ -285,8 +289,10 @@ public class Game extends Canvas {
 	public void PlantDynamite(PlayerEntity player) {		
 		Point gPoint = gameBoard.getGridPixel(24+player.getX(), 24+player.getY());
 		if(gameBoard.add(new DynamiteEntity(gPoint.x, gPoint.y,
-				spriteStore, "sprites/dynamite.png", player)))
+				spriteStore, "sprites/dynamite.png", player))) {
+			multiplayer.sendMessage(3 << 0 | gPoint.x << 4 | gPoint.y << 16 );
 			player.decreaseDynamite();
+		}
 	}
 	
 	public void explodeDynamite(DynamiteEntity dynamite) {
@@ -378,8 +384,13 @@ public class Game extends Canvas {
 		waitOnOtherPlayer.release();
 	}
 	
-	public void notifySetRemotePlayerPosition(double x, double y) {
+	public void notifySetRemotePlayerPosition(int x, int y) {
 		remotePlayer.setPosition(x, y);
+	}
+	
+	public void notifyRemotePlayerSettingBomb(int x, int y) {
+		gameBoard.add(new DynamiteEntity(x, y,
+				spriteStore, "sprites/dynamite.png", remotePlayer));
 	}
 	
 	public void finishBeam(BeamEntity beam) {

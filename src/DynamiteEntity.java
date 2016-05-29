@@ -17,7 +17,7 @@ public class DynamiteEntity extends Entity {
 		this.rectangle.height = sprite.getHeight();
 		this.owner = owner;
 		this.lost = false;
-		plantTime = System.currentTimeMillis();
+		this.plantTime = System.currentTimeMillis();
 	}
 	
 	public void tick(Game game) {

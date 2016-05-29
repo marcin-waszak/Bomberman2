@@ -43,6 +43,7 @@ public class Multiplayer {
 	private boolean connect(String ip, int port) {
 		try {
 			socket = new Socket(ip, port);
+			socket.setTcpNoDelay(true);
 			dos = new DataOutputStream(socket.getOutputStream());
 			dis = new DataInputStream(socket.getInputStream());
 			System.out.println("Successfully connected to the server.");
@@ -55,15 +56,16 @@ public class Multiplayer {
 	}
 	
 	private void listenForServerRequest(ServerSocket serverSocket) {
-			try {
-				socket = serverSocket.accept();
-				dos = new DataOutputStream(socket.getOutputStream());
-				dis = new DataInputStream(socket.getInputStream());
-				System.out.println("CLIENT HAS REQUESTED TO JOIN, AND WE HAVE ACCEPTED");
-				is_server = true;
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		try {
+			socket = serverSocket.accept();
+			socket.setTcpNoDelay(true);
+			dos = new DataOutputStream(socket.getOutputStream());
+			dis = new DataInputStream(socket.getInputStream());
+			System.out.println("CLIENT HAS REQUESTED TO JOIN, AND WE HAVE ACCEPTED");
+			is_server = true;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public boolean getIs_server() {
