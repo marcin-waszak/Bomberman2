@@ -49,15 +49,17 @@ public class PlayerEntity extends Entity {
 			if(entity == this)
 				continue;
 			if(entity instanceof BackgroundEntity)
-				continue;			
-			if(entity instanceof DynamiteEntity)
 				continue;
 			if(entity instanceof BeamEntity)
 				continue;
+			if(entity instanceof DynamiteEntity &&
+				((DynamiteEntity) entity).getOwner() != entity &&
+					!((DynamiteEntity)entity).isLost())
+						continue;			
 
 			Rectangle2D.Double r_player;
 			Rectangle2D.Double r_brick;
-			
+			 
 			r_player = new Rectangle2D.Double(x, y, playerSize, playerSize);
 			if(entity instanceof PlayerEntity)
 				r_brick = new Rectangle2D.Double(entity.x, entity.y, playerSize, playerSize);

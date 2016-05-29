@@ -5,6 +5,7 @@ public class DynamiteEntity extends Entity {
 	private long plantTime;
 	private long dynamiteTime = 2000;
 	private PlayerEntity owner;
+	private boolean lost;
 
 	public DynamiteEntity(double x, double y, SpriteStore spriteStore, String path,
 			PlayerEntity owner) {
@@ -15,21 +16,28 @@ public class DynamiteEntity extends Entity {
 		this.rectangle.width = sprite.getWidth();
 		this.rectangle.height = sprite.getHeight();
 		this.owner = owner;
+		this.lost = false;
 		plantTime = System.currentTimeMillis();
 	}
 	
 	public void tick(Game game) {
 		if(System.currentTimeMillis() - plantTime > dynamiteTime)
 			game.explodeDynamite(this);
+		
+		if(!lost && !this.collidesWith(owner))
+			lost = true;
 	}
 	
 	public PlayerEntity getOwner() {
 		return owner;
+	}
+	
+	public boolean isLost() {
+		return lost;
 	}
 
 	@Override
 	void draw(Graphics2D g2d) {
 		sprite.draw(g2d, getActualX(), getActualY());
 	}
-
 }

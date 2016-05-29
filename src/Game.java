@@ -108,6 +108,17 @@ public class Game extends Canvas {
 				continue;
 			}
 		}
+		
+		for(int i = 0; i < 4; i++) {
+			int kx = random.nextInt((12 - 0) + 1) + 0;
+			int ky = random.nextInt((10 - 0) + 1) + 0;
+			
+			if(isSpawnPoint(kx, ky) || !gameBoard.add(new PickupEntity(64*kx, 64*ky,
+					spriteStore, "sprites/pickup.png")))  {
+				i--;
+				continue;
+			}
+		}
 	}
 	
 	private Graphics2D initGraphics() {
@@ -131,6 +142,8 @@ public class Game extends Canvas {
 						if(anotherEntity instanceof PlayerEntity)
 							gameBoard.remove(anotherEntity);
 						else if(anotherEntity instanceof BoxEntity)
+							gameBoard.remove(anotherEntity);
+						else if(anotherEntity instanceof PickupEntity)
 							gameBoard.remove(anotherEntity);
 					}
 				}
@@ -197,11 +210,11 @@ public class Game extends Canvas {
 		
 		if(entity instanceof BrickEntity)
 			return 2; // break outerloop		
-		
-		if(entity instanceof BrickEntity)
-			return 2; // break outerloop
-		
+
 		if(entity instanceof PlayerEntity)
+			return 2;
+		
+		if(entity instanceof PickupEntity)
 			return 2;
 		
 		return 0; // do nothing

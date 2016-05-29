@@ -21,7 +21,7 @@ public class KeyInputHandler extends KeyAdapter {
 			if (e.getKeyCode() == KeyEvent.VK_DOWN) {
 				down_pressed = true;
 			}
-			if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+			if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
 				space_pressed = true;
 			}
 		} 
@@ -39,7 +39,7 @@ public class KeyInputHandler extends KeyAdapter {
 			if (e.getKeyCode() == KeyEvent.VK_DOWN) {
 				down_pressed = false;
 			}
-			if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+			if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
 				space_pressed = false;
 			}
 		}
