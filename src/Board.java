@@ -44,11 +44,11 @@ public class Board {
 	}
 	
 	public void tick() {
-		entities.removeAll(to_remove);
 		entities.addAll(to_add);
-		
-		to_remove.clear();
 		to_add.clear();
+		entities.removeAll(to_remove);
+		to_remove.clear();
+		
 	}
 	
 	public void draw(Graphics2D g2d) {

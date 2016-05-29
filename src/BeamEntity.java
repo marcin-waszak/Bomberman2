@@ -4,15 +4,15 @@ public class BeamEntity extends Entity {
 	private Sprite sprite;
 	private long explosionTime;
 	private long beamTime = 500;
-	private PlayerEntity owner;
 	
-	public BeamEntity(double x, double y, SpriteStore spriteStore, String path,
-			PlayerEntity owner) {
+	public BeamEntity(double x, double y, SpriteStore spriteStore, String path) {
 		super(x, y);
 		this.sprite = spriteStore.getSprite(path);
-		this.owner = owner;
 		this.explosionTime = System.currentTimeMillis();
-		
+		this.rectangle.x = (int)x;
+		this.rectangle.y = (int)y;
+		this.rectangle.width = sprite.getWidth();
+		this.rectangle.height = sprite.getHeight();
 	}
 	
 	public void tick(Game game) {

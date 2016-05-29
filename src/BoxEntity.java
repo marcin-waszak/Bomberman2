@@ -1,13 +1,15 @@
 import java.awt.Graphics2D;
 
 public class BoxEntity extends Entity {
-	SpriteStore spriteStore;
 	Sprite sprite;
 
 	public BoxEntity(double x, double y, SpriteStore spriteStore, String path) {
 		super(x, y);
-		this.spriteStore = spriteStore;
 		this.sprite = spriteStore.getSprite(path);
+		this.rectangle.x = (int)x;
+		this.rectangle.y = (int)y;
+		this.rectangle.width = sprite.getWidth();
+		this.rectangle.height = sprite.getHeight();
 	}
 
 	@Override
