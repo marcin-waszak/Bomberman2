@@ -3,7 +3,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.BufferStrategy;
 import java.util.Random;
@@ -23,7 +22,8 @@ public class Game extends Canvas {
 	private Board statusBoard;
 	private PlayerEntity localPlayer;
 	private TextEntity fpsText;
-	private TextEntity dynamitesText;	
+	private TextEntity dynamitesText;
+	private TextEntity rangeText;
 	private TextEntity entitiesText;
 
 	public Game() {
@@ -85,10 +85,12 @@ public class Game extends Canvas {
 		
 		fpsText = new TextEntity(0, 10, "FPS: 0");
 		dynamitesText = new TextEntity(0, 24, "Dynamites: 0");
-		entitiesText = new TextEntity(0, 38, "Entities: 0");
+		rangeText = new TextEntity(0, 38, "Range: 0");
+		entitiesText = new TextEntity(0, 52, "Entities: 0");
 
 		statusBoard.add(fpsText);
 		statusBoard.add(dynamitesText);
+		statusBoard.add(rangeText);
 		statusBoard.add(entitiesText);
 		
 		localPlayer = new PlayerEntity(0, 0);
@@ -103,7 +105,7 @@ public class Game extends Canvas {
 			int ky = random.nextInt((10 - 0) + 1) + 0;
 			
 			if(isSpawnPoint(kx, ky) || !gameBoard.add(new BoxEntity(64*kx, 64*ky,
-					spriteStore, "sprites/box.png")))  {
+					spriteStore, "sprites/box.png", 1)))  {
 				i--;
 				continue;
 			}
@@ -114,7 +116,7 @@ public class Game extends Canvas {
 			int ky = random.nextInt((10 - 0) + 1) + 0;
 			
 			if(isSpawnPoint(kx, ky) || !gameBoard.add(new PickupEntity(64*kx, 64*ky,
-					spriteStore, "sprites/pickup.png")))  {
+					spriteStore, "sprites/pickup.png", 1)))  {
 				i--;
 				continue;
 			}
@@ -131,6 +133,7 @@ public class Game extends Canvas {
 	private void updateTexts() {
 		fpsText.setText("FPS: " + fps.getValue());
 		dynamitesText.setText("Dynamites: " + localPlayer.getDynamitesCount());
+		rangeText.setText("Range: " + localPlayer.getDynamiteRange());
 		entitiesText.setText("Entities: " + gameBoard.entitiesCount());
 	}
 	
@@ -141,12 +144,38 @@ public class Game extends Canvas {
 					if(entity.collidesWith(anotherEntity)) {
 						if(anotherEntity instanceof PlayerEntity)
 							gameBoard.remove(anotherEntity);
-						else if(anotherEntity instanceof BoxEntity)
+						else if(anotherEntity instanceof BoxEntity) {
 							gameBoard.remove(anotherEntity);
-						else if(anotherEntity instanceof PickupEntity)
+							gameBoard.add(new PickupEntity(anotherEntity.x,
+									anotherEntity.y, spriteStore, "sprites/pickup.png", 1));
+						}
+						else if(anotherEntity instanceof PickupEntity
+								&& !((PickupEntity)anotherEntity).getInvulnerability())
 							gameBoard.remove(anotherEntity);
 						else if(anotherEntity instanceof DynamiteEntity)
 							explodeDynamite((DynamiteEntity)anotherEntity);
+					}
+				}
+	}
+	
+	private void handlePickingUp() {
+		for(Entity entity : gameBoard.getEntities())
+			if(entity instanceof PlayerEntity)
+				for(Entity anotherEntity : gameBoard.getEntities()) {
+					if(entity.collidesWith(anotherEntity)) {
+						if(anotherEntity instanceof PickupEntity) {
+							switch(((PickupEntity)anotherEntity).getBonus()) {
+							case 1:
+								((PlayerEntity) entity).increaseDynamites();
+								break;
+							case 2:
+								((PlayerEntity) entity).increaseDynamiteRange();
+								break;
+							default: break;
+							}
+							
+							gameBoard.remove(anotherEntity);
+						}
 					}
 				}
 	}	
@@ -157,6 +186,7 @@ public class Game extends Canvas {
 		
 		updateTexts();
 		handleBeamCollisions();
+		handlePickingUp();
 		
 		statusBoard.tick();
 		gameBoard.tick();
@@ -231,10 +261,10 @@ public class Game extends Canvas {
 	
 	public void explodeDynamite(DynamiteEntity dynamite) {
 		PlayerEntity owner = dynamite.getOwner();
-		int range = owner.getDynamitesRange();
+		int range = owner.getDynamiteRange();
 		
 		gameBoard.remove(dynamite);
-		owner.increaseDynamite();
+		owner.increaseDynamites();
 		
 		outerloop:
 		for(int i = 0; i <= range; i++) {
@@ -245,9 +275,9 @@ public class Game extends Canvas {
 			
 			for(Entity entity : gameBoard.getEntities()) {				
 				switch(beamPenetrator(beam, entity)) {
-					case 1: continue;
-					case 2: break outerloop;
-					default: break;
+				case 1: continue;
+				case 2: break outerloop;
+				default: break;
 				}
 			}
 		}

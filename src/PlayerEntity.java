@@ -8,7 +8,7 @@ public class PlayerEntity extends Entity {
 	private long lastPlantedDynamite;
 	private long plantDynamiteInterval = 400;
 	private int numberOfDynamites = 3;
-	private int dynamiteRange = 3;
+	private int dynamiteRange = 2;
 
 	public PlayerEntity(double x, double y) {
 		super(x, y);
@@ -51,6 +51,8 @@ public class PlayerEntity extends Entity {
 			if(entity instanceof BackgroundEntity)
 				continue;
 			if(entity instanceof BeamEntity)
+				continue;
+			if(entity instanceof PickupEntity)
 				continue;
 			if(entity instanceof DynamiteEntity &&
 				((DynamiteEntity) entity).getOwner() != entity &&
@@ -103,7 +105,7 @@ public class PlayerEntity extends Entity {
 		game.PlantDynamite(this);	
 	}
 	
-	public void increaseDynamite() {
+	public void increaseDynamites() {
 		numberOfDynamites++;
 	}
 	
@@ -115,8 +117,12 @@ public class PlayerEntity extends Entity {
 		return numberOfDynamites;
 	}
 	
-	public int getDynamitesRange() {
+	public int getDynamiteRange() {
 		return dynamiteRange;
+	}
+	
+	public void increaseDynamiteRange() {
+		numberOfDynamites++;
 	}
 	
 	public int getPlayerSize() {
