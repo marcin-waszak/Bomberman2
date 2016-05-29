@@ -3,8 +3,8 @@ import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 
 public class PlayerEntity extends Entity {
-	private static final int playerSize = 48;
-	private static final int PLAYER_SPEED = 400;
+	private static final int playerSize = 42;
+	private static final int PLAYER_SPEED = 250;
 	private long lastPlantedDynamite;
 	private long plantDynamiteInterval = 400;
 	private int numberOfDynamites = 3;

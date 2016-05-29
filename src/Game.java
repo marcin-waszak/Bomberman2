@@ -100,26 +100,15 @@ public class Game extends Canvas {
 			for(int k = 0; k < 5; k++) 
 				gameBoard.add(new BrickEntity(64*(1+2*i), 64*(1+2*k), spriteStore, "sprites/brick.png"));
 		
-		for(int i = 0; i < 1; i++) {
-			int kx = random.nextInt((12 - 0) + 1) + 0;
-			int ky = random.nextInt((10 - 0) + 1) + 0;
-			
-			if(isSpawnPoint(kx, ky) || !gameBoard.add(new BoxEntity(64*kx, 64*ky,
-					spriteStore, "sprites/box.png", 1)))  {
-				i--;
-				continue;
-			}
-		}
-		
-		for(int i = 0; i < 4; i++) {
-			int kx = random.nextInt((12 - 0) + 1) + 0;
-			int ky = random.nextInt((10 - 0) + 1) + 0;
-			
-			if(isSpawnPoint(kx, ky) || !gameBoard.add(new PickupEntity(64*kx, 64*ky,
-					spriteStore, "sprites/pickup.png", 1)))  {
-				i--;
-				continue;
-			}
+		for(int x = 0; x < 13; x++) {
+			for(int y = 0; y < 11; y++) {
+				if(!isSpawnPoint(x, y) && (random.nextInt(5) <= 3)) {
+					gameBoard.add(new BoxEntity(64*x, 64*y, spriteStore, "sprites/box.png", 1));
+				}
+				if(x % 2 == 1) {
+					y++;
+				}
+			}			
 		}
 	}
 	
@@ -146,8 +135,10 @@ public class Game extends Canvas {
 							gameBoard.remove(anotherEntity);
 						else if(anotherEntity instanceof BoxEntity) {
 							gameBoard.remove(anotherEntity);
-							gameBoard.add(new PickupEntity(anotherEntity.x,
+							if(random.nextInt(5) == 0) {
+								gameBoard.add(new PickupEntity(anotherEntity.x,
 									anotherEntity.y, spriteStore, "sprites/pickup.png", 1));
+							}
 						}
 						else if(anotherEntity instanceof PickupEntity
 								&& !((PickupEntity)anotherEntity).getInvulnerability())
@@ -247,6 +238,9 @@ public class Game extends Canvas {
 			return 2;
 		
 		if(entity instanceof PickupEntity)
+			return 2;
+		
+		if(entity instanceof BoxEntity)
 			return 2;
 		
 		return 0; // do nothing
