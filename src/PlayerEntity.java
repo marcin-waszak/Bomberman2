@@ -3,10 +3,12 @@ import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 
 public class PlayerEntity extends Entity {
+	private static final int playerSize = 48;
 	private static final int PLAYER_SPEED = 400;
 	private long lastPlantedDynamite;
 	private long plantDynamiteInterval = 400;
 	private int numberOfDynamites = 3;
+	private int dynamiteRange = 3;
 
 	public PlayerEntity(double x, double y) {
 		super(x, y);
@@ -37,10 +39,10 @@ public class PlayerEntity extends Entity {
 		if(y + dy < 0)
 			dy = 0;
 
-		if(x+48 + dx > board.getWidth())
+		if(x + playerSize + dx > board.getWidth())
 			dx = 0;
 
-		if(y+48 + dy > board.getHeight())
+		if(y + playerSize + dy > board.getHeight())
 			dy = 0;
 
 		for(Entity entity : board.entities) {
@@ -56,9 +58,9 @@ public class PlayerEntity extends Entity {
 			Rectangle2D.Double r_player;
 			Rectangle2D.Double r_brick;
 			
-			r_player = new Rectangle2D.Double(x, y, 48, 48);
+			r_player = new Rectangle2D.Double(x, y, playerSize, playerSize);
 			if(entity instanceof PlayerEntity)
-				r_brick = new Rectangle2D.Double(entity.x, entity.y, 48, 48);
+				r_brick = new Rectangle2D.Double(entity.x, entity.y, playerSize, playerSize);
 			else
 				r_brick = new Rectangle2D.Double(entity.x, entity.y, 64, 64);
 
@@ -81,6 +83,11 @@ public class PlayerEntity extends Entity {
 		
 		if(keyHandler.isSpacePressed())
 			TryPlantDynamite(game);
+		
+		this.rectangle.x = (int)x;
+		this.rectangle.y = (int)y;
+		this.rectangle.width = playerSize;
+		this.rectangle.height = playerSize;
 	}
 
 	private void TryPlantDynamite(Game game) {
@@ -106,10 +113,17 @@ public class PlayerEntity extends Entity {
 		return numberOfDynamites;
 	}
 	
+	public int getDynamitesRange() {
+		return dynamiteRange;
+	}
+	
+	public int getPlayerSize() {
+		return playerSize;
+	}
+	
 	@Override
 	public void draw(Graphics2D g2d) {
 		g2d.setColor(Color.red);
-		g2d.fillRect(getActualX(), getActualY(), 48, 48);
+		g2d.fillRect(getActualX(), getActualY(), playerSize, playerSize);
 	}
-
 }

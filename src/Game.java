@@ -1,9 +1,9 @@
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.BufferStrategy;
 import java.util.Random;
@@ -67,10 +67,6 @@ public class Game extends Canvas {
 		// make FPS handler
 		fps = new FPS();
 		
-		// initialize the entities in our game so there's something
-		// to see at startup
-		// initEntities();
-		
 		spriteStore = new SpriteStore();
 		gameBoard = new GameBoard(8, 8, 832, 704);
 		statusBoard = new Board(848, 8, 168, 704);
@@ -102,7 +98,7 @@ public class Game extends Canvas {
 			for(int k = 0; k < 5; k++) 
 				gameBoard.add(new BrickEntity(64*(1+2*i), 64*(1+2*k), spriteStore, "sprites/brick.png"));
 		
-		for(int i = 0; i < 23; i++) {
+		for(int i = 0; i < 1; i++) {
 			int kx = random.nextInt((12 - 0) + 1) + 0;
 			int ky = random.nextInt((10 - 0) + 1) + 0;
 			
@@ -121,26 +117,42 @@ public class Game extends Canvas {
 		return g2d;
 	}
 	
+	private void updateTexts() {
+		fpsText.setText("FPS: " + fps.getValue());
+		dynamitesText.setText("Dynamites: " + localPlayer.getDynamitesCount());
+		entitiesText.setText("Entities: " + gameBoard.entitiesCount());
+	}
+	
+	private void handleBeamCollisions() {
+		for(Entity entity : gameBoard.getEntities())
+			if(entity instanceof BeamEntity)
+				for(Entity anotherEntity : gameBoard.getEntities()) {
+					if(entity.collidesWith(anotherEntity)) {
+						if(anotherEntity instanceof PlayerEntity)
+							gameBoard.remove(anotherEntity);
+						else if(anotherEntity instanceof BoxEntity)
+							gameBoard.remove(anotherEntity);
+					}
+				}
+	}	
+	
 	private void doLogic() {		
 		for(Entity entity : gameBoard.getEntities())
 			entity.tick(this);
 		
-		fpsText.setText("FPS: " + fps.getValue());
-		dynamitesText.setText("Dynamites: " + localPlayer.getDynamitesCount());
-		entitiesText.setText("Entities: " + gameBoard.entitiesCount());
+		updateTexts();
+		handleBeamCollisions();
 		
 		statusBoard.tick();
 		gameBoard.tick();
 	}
 	
-	private void clear(Graphics2D g2d)
-	{
+	private void clear(Graphics2D g2d) {
 		g2d.setColor(Color.black);
 		g2d.fillRect(0, 0, getWidth(), getHeight());
 	}
 	
-	private void draw(Graphics2D g2d)
-	{
+	private void draw(Graphics2D g2d) 	{
 		gameBoard.draw(g2d);
 		statusBoard.draw(g2d);
 
@@ -173,6 +185,28 @@ public class Game extends Canvas {
 		return false;
 	}
 	
+	private int beamPenetrator(BeamEntity beam, Entity entity) {		
+		if(entity instanceof BackgroundEntity)
+			return 1; // continue
+		
+		if(entity instanceof BeamEntity)
+			return 1;
+		
+		if(!beam.collidesWith(entity))
+			return 1;
+		
+		if(entity instanceof BrickEntity)
+			return 2; // break outerloop		
+		
+		if(entity instanceof BrickEntity)
+			return 2; // break outerloop
+		
+		if(entity instanceof PlayerEntity)
+			return 2;
+		
+		return 0; // do nothing
+	}
+	
 	public void PlantDynamite(PlayerEntity player) {		
 		Point gPoint = gameBoard.getGridPixel(24+player.getX(), 24+player.getY());
 		if(gameBoard.add(new DynamiteEntity(gPoint.x, gPoint.y,
@@ -181,13 +215,75 @@ public class Game extends Canvas {
 	}
 	
 	public void explodeDynamite(DynamiteEntity dynamite) {
+		PlayerEntity owner = dynamite.getOwner();
+		int range = owner.getDynamitesRange();
+		
 		gameBoard.remove(dynamite);
-		dynamite.getOwner().increaseDynamite();
+		owner.increaseDynamite();
 		
-		BeamEntity beam = new BeamEntity(dynamite.getX(), dynamite.getY(),
-				spriteStore, "sprites/beam.png", dynamite.getOwner());
+		outerloop:
+		for(int i = 0; i <= range; i++) {
+			BeamEntity beam = new BeamEntity(dynamite.getX() + i*64, dynamite.getY(),
+					spriteStore, "sprites/beam.png");
+			
+			gameBoard.add(beam);
+			
+			for(Entity entity : gameBoard.getEntities()) {				
+				switch(beamPenetrator(beam, entity)) {
+					case 1: continue;
+					case 2: break outerloop;
+					default: break;
+				}
+			}
+		}
 		
-		gameBoard.add(beam);
+		outerloop:
+		for(int i = 1; i <= range; i++) {
+			BeamEntity beam = new BeamEntity(dynamite.getX() - i*64, dynamite.getY(),
+					spriteStore, "sprites/beam.png");
+			
+			gameBoard.add(beam);
+			
+			for(Entity entity : gameBoard.getEntities()) {				
+				switch(beamPenetrator(beam, entity)) {
+					case 1: continue;
+					case 2: break outerloop;
+					default: break;
+				}
+			}
+		}
+		
+		outerloop:
+		for(int i = 1; i <= range; i++) {
+			BeamEntity beam = new BeamEntity(dynamite.getX(), dynamite.getY() + i*64,
+					spriteStore, "sprites/beam.png");
+			
+			gameBoard.add(beam);
+			
+			for(Entity entity : gameBoard.getEntities()) {				
+				switch(beamPenetrator(beam, entity)) {
+					case 1: continue;
+					case 2: break outerloop;
+					default: break;
+				}
+			}
+		}
+		
+		outerloop:
+		for(int i = 1; i <= range; i++) {
+			BeamEntity beam = new BeamEntity(dynamite.getX(), dynamite.getY() - i*64,
+					spriteStore, "sprites/beam.png");
+			
+			gameBoard.add(beam);
+			
+			for(Entity entity : gameBoard.getEntities()) {				
+				switch(beamPenetrator(beam, entity)) {
+					case 1: continue;
+					case 2: break outerloop;
+					default: break;
+				}
+			}
+		}
 	}
 	
 	public void finishBeam(BeamEntity beam) {
@@ -197,8 +293,7 @@ public class Game extends Canvas {
 	public void gameLoop() {
 		Graphics2D g2d;
 		
-		while(true)
-		{
+		while(true) {
 			fps.measure();	
 			
 			doLogic();			

@@ -1,4 +1,5 @@
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 
 public abstract class Entity {
 	protected double x;
@@ -6,12 +7,14 @@ public abstract class Entity {
 	protected Board board;
 	protected int offsetX;
 	protected int offsetY;
+	protected Rectangle rectangle;
 	
 	public Entity(double x, double y) {
 		setPosition(x, y);
 		board = null;
 		offsetX = 0;
 		offsetY = 0;
+		rectangle = new Rectangle();
 	}
 	
 	public void setBoard(Board board) {
@@ -30,11 +33,11 @@ public abstract class Entity {
 		this.y += dy;
 	}
 	
-	protected double getX() {
+	public double getX() {
 		return x;
 	}
 	
-	protected double getY() {
+	public double getY() {
 		return y;
 	}
 	
@@ -46,7 +49,17 @@ public abstract class Entity {
 		return (int)y + offsetY;
 	}
 	
-	void tick(Game game) {
+	public Rectangle getRectangle() {
+		return rectangle;
+	}
+	
+	public boolean collidesWith(Entity entity) {
+		if(rectangle.intersects(entity.getRectangle()))
+			return true;
+		return false;
+	}
+	
+	public void tick(Game game) {
 		
 	}
 	
