@@ -23,5 +23,5 @@ public class BoxEntity extends Entity {
 	void draw(Graphics2D g2d) {
 		sprite.draw(g2d, getActualX(), getActualY());
 	}
-
+	
 }

@@ -7,87 +7,96 @@ public class PlayerEntity extends Entity {
 	private static final int PLAYER_SPEED = 250;
 	private long lastPlantedDynamite;
 	private long plantDynamiteInterval = 400;
-	private int numberOfDynamites = 3;
+	private int numberOfDynamites = 1;
 	private int dynamiteRange = 2;
+	private Color color;
+	private Multiplayer multiplayer;
+	private boolean remote;	
 
-	public PlayerEntity(double x, double y) {
+	public PlayerEntity(double x, double y, Color color, Multiplayer multiplayer, boolean remote) {
 		super(x, y);
+		this.color = color;
+		this.multiplayer = multiplayer;
+		this.remote = remote;
 	}
 
 	public void tick(Game game) {
-		// Movement
-		KeyInputHandler keyHandler = game.getKeyInputHandler();
-		double step = PLAYER_SPEED * game.getFPSHandler().getFrameTime(); //TODO
-		double dx = 0;
-		double dy = 0;		
-
-		if(keyHandler.isUpPressed())
-			dy -= step;
-
-		if(keyHandler.isDownPressed())
-			dy += step;
-
-		if(keyHandler.isLeftPressed())
-			dx -= step;
-
-		if(keyHandler.isRightPressed())
-			dx += step;
-
-		if(x + dx < 0)
-			dx = 0;
-
-		if(y + dy < 0)
-			dy = 0;
-
-		if(x + playerSize + dx > board.getWidth())
-			dx = 0;
-
-		if(y + playerSize + dy > board.getHeight())
-			dy = 0;
-
-		for(Entity entity : board.entities) {
-			if(entity == this)
-				continue;
-			if(entity instanceof BackgroundEntity)
-				continue;
-			if(entity instanceof BeamEntity)
-				continue;
-			if(entity instanceof PickupEntity)
-				continue;
-			if(entity instanceof DynamiteEntity &&
-				((DynamiteEntity) entity).getOwner() != entity &&
-					!((DynamiteEntity)entity).isLost())
-				continue;			
-
-			Rectangle2D.Double r_player;
-			Rectangle2D.Double r_brick;
-			 
-			r_player = new Rectangle2D.Double(x, y, playerSize, playerSize);
-			if(entity instanceof PlayerEntity)
-				r_brick = new Rectangle2D.Double(entity.x, entity.y, playerSize, playerSize);
-			else
-				r_brick = new Rectangle2D.Double(entity.x, entity.y, 64, 64);
-
-			r_player.x += dx;
-			if(r_player.intersects(r_brick)) {
-				r_player.x -= dx;
+		if(remote == false) {
+			// Movement
+			KeyInputHandler keyHandler = game.getKeyInputHandler();
+			double step = PLAYER_SPEED * game.getFPSHandler().getFrameTime(); //TODO
+			double dx = 0;
+			double dy = 0;		
+	
+			if(keyHandler.isUpPressed())
+				dy -= step;
+	
+			if(keyHandler.isDownPressed())
+				dy += step;
+	
+			if(keyHandler.isLeftPressed())
+				dx -= step;
+	
+			if(keyHandler.isRightPressed())
+				dx += step;
+	
+			if(x + dx < 0)
 				dx = 0;
-			}
-
-			r_player.y += dy;
-			if(r_player.intersects(r_brick)) {
-				r_player.y -= dy;
+	
+			if(y + dy < 0)
 				dy = 0;
+	
+			if(x + playerSize + dx > board.getWidth())
+				dx = 0;
+	
+			if(y + playerSize + dy > board.getHeight())
+				dy = 0;
+	
+			for(Entity entity : board.entities) {
+				if(entity == this)
+					continue;
+				if(entity instanceof BackgroundEntity)
+					continue;
+				if(entity instanceof BeamEntity)
+					continue;
+				if(entity instanceof PickupEntity)
+					continue;
+				if(entity instanceof DynamiteEntity &&
+					((DynamiteEntity) entity).getOwner() != entity &&
+						!((DynamiteEntity)entity).isLost())
+					continue;			
+	
+				Rectangle2D.Double r_player;
+				Rectangle2D.Double r_brick;
+				 
+				r_player = new Rectangle2D.Double(x, y, playerSize, playerSize);
+				if(entity instanceof PlayerEntity)
+					r_brick = new Rectangle2D.Double(entity.x, entity.y, playerSize, playerSize);
+				else
+					r_brick = new Rectangle2D.Double(entity.x, entity.y, 64, 64);
+	
+				r_player.x += dx;
+				if(r_player.intersects(r_brick)) {
+					r_player.x -= dx;
+					dx = 0;
+				}
+	
+				r_player.y += dy;
+				if(r_player.intersects(r_brick)) {
+					r_player.y -= dy;
+					dy = 0;
+				}
 			}
-		}
-
-		move(dx, dy);
-		
-		// Plant the dynamite
-		
-		if(keyHandler.isSpacePressed())
-			TryPlantDynamite(game);
-		
+	
+			move(dx, dy);
+			
+			multiplayer.sendMessage(2 << 0 | (int)x << 8 | (int)y << 16);
+			
+			// Plant the dynamite
+			if(keyHandler.isSpacePressed())
+				TryPlantDynamite(game);
+		}	
+			
 		this.rectangle.x = (int)x;
 		this.rectangle.y = (int)y;
 		this.rectangle.width = playerSize;
@@ -131,7 +140,7 @@ public class PlayerEntity extends Entity {
 	
 	@Override
 	public void draw(Graphics2D g2d) {
-		g2d.setColor(Color.red);
+		g2d.setColor(color);
 		g2d.fillRect(getActualX(), getActualY(), playerSize, playerSize);
 	}
 }

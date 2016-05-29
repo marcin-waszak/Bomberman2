@@ -6,27 +6,46 @@ import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.image.BufferStrategy;
 import java.util.Random;
+import java.util.concurrent.Semaphore;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class Game extends Canvas {
 	static final int R_WIDTH = 1024;
 	static final int R_HEIGHT = 720;
+	static final int NUM_OF_DIFFERENT_BONUSES = 2;	
 	
+	private Semaphore waitOnOtherPlayer;
 	private Random random;
 	private KeyInputHandler keyInputHandler;
 	private BufferStrategy strategy;
 	private FPS fps;
 	private SpriteStore spriteStore;
+	
+	private Multiplayer multiplayer;
+	private MessageListener messageListener;
+	
 	private GameBoard gameBoard;
 	private Board statusBoard;
+
 	private PlayerEntity localPlayer;
+	private PlayerEntity remotePlayer;
+	
 	private TextEntity fpsText;
 	private TextEntity dynamitesText;
 	private TextEntity rangeText;
 	private TextEntity entitiesText;
 
 	public Game() {
+		
+		// create or join server
+		multiplayer = new Multiplayer();
+
+		// create a thread for receiving messages
+		messageListener = new MessageListener(this, multiplayer);
+		new Thread(messageListener).start();
+		
 		// create a frame to contain our game
 		JFrame frame = new JFrame("Bomberman 2");
 		
@@ -50,6 +69,7 @@ public class Game extends Canvas {
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
+		waitOnOtherPlayer = new Semaphore(0);
 		random = new Random();
 		// add a key input system (defined below) to our canvas
 		// so we can respond to key pressed
@@ -93,23 +113,40 @@ public class Game extends Canvas {
 		statusBoard.add(rangeText);
 		statusBoard.add(entitiesText);
 		
-		localPlayer = new PlayerEntity(0, 0);
+		if(multiplayer.getIs_server() == true) {
+			localPlayer = new PlayerEntity(0, 0, Color.white, multiplayer, false);
+			remotePlayer = new PlayerEntity(770, 640, Color.black, multiplayer, true);
+		} else {
+			localPlayer = new PlayerEntity(770, 640, Color.black, multiplayer, false);
+			remotePlayer = new PlayerEntity(0, 0, Color.white, multiplayer, true);
+		}
+		
+		synchronize();
+		
 		gameBoard.add(localPlayer);
+		gameBoard.add(remotePlayer);
 		
 		for(int i = 0; i < 6; i++)
 			for(int k = 0; k < 5; k++) 
 				gameBoard.add(new BrickEntity(64*(1+2*i), 64*(1+2*k), spriteStore, "sprites/brick.png"));
 		
-		for(int x = 0; x < 13; x++) {
-			for(int y = 0; y < 11; y++) {
-				if(!isSpawnPoint(x, y) && (random.nextInt(5) <= 3)) {
-					gameBoard.add(new BoxEntity(64*x, 64*y, spriteStore, "sprites/box.png", 1));
-				}
-				if(x % 2 == 1) {
-					y++;
-				}
-			}			
+		if(multiplayer.getIs_server() == true) {
+			for(int x = 0; x < 13; x++) {
+				for(int y = 0; y < 11; y++) {
+					if(!isSpawnPoint(x, y) && (random.nextInt(5) <= 3)) {
+						int i = random.nextInt(NUM_OF_DIFFERENT_BONUSES + 1);
+						gameBoard.add(new BoxEntity(64*x, 64*y, spriteStore, "sprites/box.png", i));
+						
+						multiplayer.sendMessage(1 << 0 | x << 8 | y << 16 | i << 24);
+					}
+					if(x % 2 == 1) {
+						y++;
+					}
+				}			
+			}
 		}
+		
+		synchronize();
 	}
 	
 	private Graphics2D initGraphics() {
@@ -163,8 +200,7 @@ public class Game extends Canvas {
 								((PlayerEntity) entity).increaseDynamiteRange();
 								break;
 							default: break;
-							}
-							
+							}							
 							gameBoard.remove(anotherEntity);
 						}
 					}
@@ -323,6 +359,27 @@ public class Game extends Canvas {
 				}
 			}
 		}
+	}
+	
+	private void synchronize() {
+		multiplayer.sendMessage(9);
+		try {
+			waitOnOtherPlayer.acquire();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void notifyAddBox(int x, int y, int i) {
+		gameBoard.add(new BoxEntity(64*x, 64*y, spriteStore, "sprites/box.png", i));
+	}
+	
+	public void notifySemaphoreRelease() {
+		waitOnOtherPlayer.release();
+	}
+	
+	public void notifySetRemotePlayerPosition(double x, double y) {
+		remotePlayer.setPosition(x, y);
 	}
 	
 	public void finishBeam(BeamEntity beam) {
