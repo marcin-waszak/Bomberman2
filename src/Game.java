@@ -464,7 +464,7 @@ public class Game extends Canvas {
 					initTemporaryEntities();
 				}
 			}
-		//	fps.stabilize();
+			fps.stabilize();
 		}
 	}
 
