@@ -39,11 +39,15 @@ public class Game extends Canvas {
 	private TextEntity pointsText;
 	private TextEntity wonGameText;
 	private TextEntity lostGameText;
+	private TextEntity drawGameText;
 	private TextEntity waitOnOtherPlayerText;
 	
+	private boolean isEpilogTextSet;
+	
 	private int points;
-	private boolean ended_game;
-	private boolean lost_game;
+	private boolean gameEnded;
+	private boolean remotePlayerDied;
+	private boolean localPlayerDied;
 
 	public Game() {
 		
@@ -81,8 +85,10 @@ public class Game extends Canvas {
 		
 		random = new Random();
 		points = 0;
-		ended_game = false;
-		lost_game  = false;
+		gameEnded = false;
+		remotePlayerDied  = false;
+		localPlayerDied = false;
+		isEpilogTextSet = false;
 		// add a key input system (defined below) to our canvas
 		// so we can respond to key pressed
 		keyInputHandler = new KeyInputHandler();
@@ -119,6 +125,7 @@ public class Game extends Canvas {
 		
 		wonGameText = new TextEntity(40, 357, "You Won! Press ENTER to start next round!", 40.F, Color.ORANGE);
 		lostGameText = new TextEntity(40, 357, "You Lost! Press ENTER to start next round!", 40.F, Color.CYAN);
+		drawGameText = new TextEntity(40, 357, "A Draw! Press ENTER to start next round!", 40.F, Color.WHITE);
 		waitOnOtherPlayerText = new TextEntity(200, 407, "Waiting on other player...", 40.F, Color.YELLOW);
 
 		statusBoard.add(fpsText);
@@ -196,14 +203,12 @@ public class Game extends Canvas {
 					if(entity.collidesWith(anotherEntity)) {
 						if(anotherEntity instanceof PlayerEntity) {
 							if(((PlayerEntity)anotherEntity).isRemote() == true) {
-								lost_game = false;
 								points++;
-								gameBoard.add(wonGameText);
+								remotePlayerDied = true;
 							} else {
-								lost_game = true;
-								gameBoard.add(lostGameText);
+								localPlayerDied = true;
 							}
-							ended_game = true;
+							gameEnded = true;
 							gameBoard.remove(anotherEntity);
 						}
 						else if(anotherEntity instanceof BoxEntity) {
@@ -250,7 +255,7 @@ public class Game extends Canvas {
 			updateTexts();
 			handleBeamCollisions();
 			handlePickingUp();
-			
+						
 			statusBoard.tick();
 			gameBoard.tick();
 	}
@@ -440,14 +445,16 @@ public class Game extends Canvas {
 		while(true) {
 			fps.measure();	
 			
-			if(ended_game == false) {
+			if(gameEnded == false) {
 				doLogic();
 				g2d = initGraphics();			
 				clear(g2d);
 				draw(g2d);
 			} else {
+				epilogText();
 				if(keyInputHandler.isEnterPressed() == true) {
-					ended_game = false;
+					gameEnded = false;
+					isEpilogTextSet = false;
 					gameBoard.add(waitOnOtherPlayerText);
 					gameBoard.tick();
 					g2d = initGraphics();			
@@ -457,10 +464,32 @@ public class Game extends Canvas {
 					initTemporaryEntities();
 				}
 			}
-			fps.stabilize();
+		//	fps.stabilize();
 		}
 	}
 
+	private void epilogText() {
+		if(isEpilogTextSet == false) {
+			if(localPlayerDied == true) {
+				localPlayerDied = false;
+				if(remotePlayerDied == true) {
+					remotePlayerDied = false;
+					gameBoard.add(drawGameText);
+				} else {
+					gameBoard.add(lostGameText);
+				}
+			} else {
+				remotePlayerDied = false;
+				gameBoard.add(wonGameText);
+			}
+			isEpilogTextSet = true;
+			gameBoard.tick();
+			Graphics2D g2d = initGraphics();			
+			clear(g2d);
+			draw(g2d);
+		}
+	}
+	
 	public static void main(String[] args) {
 		Game game = new Game();
 		
