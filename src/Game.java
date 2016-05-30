@@ -159,7 +159,7 @@ public class Game extends Canvas {
 			for(int k = 0; k < 5; k++) 
 				gameBoard.add(new BrickEntity(64*(1+2*i), 64*(1+2*k), spriteStore, "sprites/brick.png"));
 		
-		if(multiplayer.getIs_server() == true) {
+		/*if(multiplayer.getIs_server() == true) {
 			for(int x = 0; x < 13; x++) {
 				for(int y = 0; y < 11; y++) {
 					if(!isSpawnPoint(x, y) && (random.nextInt(5) <= 3)) {
@@ -177,7 +177,7 @@ public class Game extends Canvas {
 					}
 				}			
 			}
-		}	
+		}*/	
 		synchronize();
 	}
 
@@ -345,7 +345,7 @@ public class Game extends Canvas {
 		owner.increaseDynamites();
 		
 		outerloop:
-		for(int i = 0; i <= range; i++) {
+		for(int i = 1; i <= range; i++) {
 			BeamEntity beam = new BeamEntity(dynamite.getX() + i*64, dynamite.getY(),
 					spriteStore, "sprites/beam.png");
 			
