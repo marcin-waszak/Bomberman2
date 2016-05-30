@@ -161,19 +161,9 @@ public class Game extends Canvas {
 		
 		if(multiplayer.getIs_server() == true) {
 			for(int x = 0; x < 13; x++) {
-				for(int y = 0; y < 11; y++) {
+				for(int y = 0; y < 11; y += (x % 2 == 1 ? 2 : 1)) {
 					if(!isSpawnPoint(x, y) && (random.nextInt(5) <= 3)) {
-						int i;
-						if(random.nextInt(5) <= 0) {
-							i = random.nextInt(NUM_OF_DIFFERENT_BONUSES) + 1;
-						} else {
-							i = 0;
-						}
-						gameBoard.add(new BoxEntity(64*x, 64*y, spriteStore, "sprites/box.png", i));					
-						multiplayer.sendMessage(1 << 0 | x << 4 | y << 16 | i << 28);
-					}
-					if(x % 2 == 1) {
-						y++;
+						spawnBox(x, y);
 					}
 				}			
 			}
@@ -409,6 +399,34 @@ public class Game extends Canvas {
 		}
 	}
 	
+	private void spawnBox(int x, int y) {
+		int i = ((random.nextInt(5) <= 0) ? (random.nextInt(NUM_OF_DIFFERENT_BONUSES) + 1) : 0);
+		gameBoard.add(new BoxEntity(64*x, 64*y, spriteStore, "sprites/box.png", i));					
+		multiplayer.sendMessage(1 << 0 | x << 4 | y << 16 | i << 28);
+	}
+	
+	private void epilogText() {
+		if(isEpilogTextSet == false) {
+			if(localPlayerDied == true) {
+				localPlayerDied = false;
+				if(remotePlayerDied == true) {
+					remotePlayerDied = false;
+					gameBoard.add(drawGameText);
+				} else {
+					gameBoard.add(lostGameText);
+				}
+			} else {
+				remotePlayerDied = false;
+				gameBoard.add(wonGameText);
+			}
+			isEpilogTextSet = true;
+			gameBoard.tick();
+			Graphics2D g2d = initGraphics();			
+			clear(g2d);
+			draw(g2d);
+		}
+	}
+	
 	private void synchronize() {
 		multiplayer.sendMessage(9);
 		try {
@@ -465,28 +483,6 @@ public class Game extends Canvas {
 				}
 			}
 			fps.stabilize();
-		}
-	}
-
-	private void epilogText() {
-		if(isEpilogTextSet == false) {
-			if(localPlayerDied == true) {
-				localPlayerDied = false;
-				if(remotePlayerDied == true) {
-					remotePlayerDied = false;
-					gameBoard.add(drawGameText);
-				} else {
-					gameBoard.add(lostGameText);
-				}
-			} else {
-				remotePlayerDied = false;
-				gameBoard.add(wonGameText);
-			}
-			isEpilogTextSet = true;
-			gameBoard.tick();
-			Graphics2D g2d = initGraphics();			
-			clear(g2d);
-			draw(g2d);
 		}
 	}
 	
