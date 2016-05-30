@@ -1,7 +1,7 @@
 import java.util.concurrent.TimeUnit;
 
 public class FPS {
-	static final int FPS = 100;
+	static final int FPS = 60;
 	static final int FRAMES_PER_MEASURMENT = 16;
 	
 	private long lastTimeMeasurment;

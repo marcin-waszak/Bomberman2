@@ -41,7 +41,9 @@ public class Game extends Canvas {
 		
 		// create or join server
 		multiplayer = new Multiplayer();
-
+		
+		waitOnOtherPlayer = new Semaphore(0);
+		
 		// create a thread for receiving messages
 		messageListener = new MessageListener(this, multiplayer);
 		new Thread(messageListener).start();
@@ -69,7 +71,6 @@ public class Game extends Canvas {
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		waitOnOtherPlayer = new Semaphore(0);
 		random = new Random();
 		// add a key input system (defined below) to our canvas
 		// so we can respond to key pressed
