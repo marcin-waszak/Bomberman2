@@ -48,6 +48,8 @@ public class Game extends Canvas {
 	private boolean gameEnded;
 	private boolean remotePlayerDied;
 	private boolean localPlayerDied;
+	
+	private BackgroundMusic backgroundMusic;
 
 	public Game() {
 		
@@ -110,6 +112,13 @@ public class Game extends Canvas {
 		statusBoard = new Board(848, 8, 168, 704);
 		
 		initEntities();
+
+		try {
+			backgroundMusic = new BackgroundMusic();
+			backgroundMusic.play();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private void initEntities() {	
@@ -484,11 +493,11 @@ public class Game extends Canvas {
 		while(true) {
 			fps.measure();	
 			
-			if(gameEnded != true) {
+			if(gameEnded == false)
 				doLogic();
-			} else {
+			else
 				endRound();
-			}
+			
 			g2d = initGraphics();			
 			clear(g2d);
 			draw(g2d);
