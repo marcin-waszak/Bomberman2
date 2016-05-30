@@ -407,24 +407,45 @@ public class Game extends Canvas {
 	
 	private void epilogText() {
 		if(isEpilogTextSet == false) {
-			if(localPlayerDied == true) {
-				localPlayerDied = false;
+			if(localPlayerDied == true) {			
+				localPlayerDied = false;	
 				if(remotePlayerDied == true) {
-					remotePlayerDied = false;
+					remotePlayerDied = false;				
 					gameBoard.add(drawGameText);
 				} else {
 					gameBoard.add(lostGameText);
 				}
 			} else {
-				remotePlayerDied = false;
+				remotePlayerDied = false;			
 				gameBoard.add(wonGameText);
 			}
-			isEpilogTextSet = true;
+			
+			isEpilogTextSet = true;		
 			gameBoard.tick();
+			
 			Graphics2D g2d = initGraphics();			
 			clear(g2d);
 			draw(g2d);
 		}
+	}
+	
+	private void endRound() {
+			epilogText();
+			
+			if(keyInputHandler.isEnterPressed() == true) {
+				gameEnded = false;
+				isEpilogTextSet = false;
+				
+				gameBoard.add(waitOnOtherPlayerText);
+				gameBoard.tick();
+				
+				Graphics2D g2d = initGraphics();			
+				clear(g2d);
+				draw(g2d);
+				
+				clearTemporaryEntities();
+				initTemporaryEntities();
+			}
 	}
 	
 	private void synchronize() {
@@ -463,25 +484,14 @@ public class Game extends Canvas {
 		while(true) {
 			fps.measure();	
 			
-			if(gameEnded == false) {
+			if(gameEnded != true) {
 				doLogic();
-				g2d = initGraphics();			
-				clear(g2d);
-				draw(g2d);
 			} else {
-				epilogText();
-				if(keyInputHandler.isEnterPressed() == true) {
-					gameEnded = false;
-					isEpilogTextSet = false;
-					gameBoard.add(waitOnOtherPlayerText);
-					gameBoard.tick();
-					g2d = initGraphics();			
-					clear(g2d);
-					draw(g2d);
-					clearTemporaryEntities();
-					initTemporaryEntities();
-				}
+				endRound();
 			}
+			g2d = initGraphics();			
+			clear(g2d);
+			draw(g2d);
 			fps.stabilize();
 		}
 	}
