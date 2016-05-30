@@ -36,6 +36,14 @@ public class Game extends Canvas {
 	private TextEntity dynamitesText;
 	private TextEntity rangeText;
 	private TextEntity entitiesText;
+	private TextEntity pointsText;
+	private TextEntity wonGameText;
+	private TextEntity lostGameText;
+	private TextEntity waitOnOtherPlayerText;
+	
+	private int points;
+	private boolean ended_game;
+	private boolean lost_game;
 
 	public Game() {
 		
@@ -72,6 +80,9 @@ public class Game extends Canvas {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		random = new Random();
+		points = 0;
+		ended_game = false;
+		lost_game  = false;
 		// add a key input system (defined below) to our canvas
 		// so we can respond to key pressed
 		keyInputHandler = new KeyInputHandler();
@@ -95,11 +106,7 @@ public class Game extends Canvas {
 		initEntities();
 	}
 	
-	private void initEntities() {
-		gameBoard.add(new BackgroundEntity(
-				0, 0, gameBoard.getWidth(), gameBoard.getHeight(),
-				Color.getHSBColor(2/3.f, 0.3f, .1f)));
-		
+	private void initEntities() {	
 		statusBoard.add(new BackgroundEntity(
 				0, 0, statusBoard.getWidth(), statusBoard.getHeight(),
 				Color.getHSBColor(1/3.f, 0.3f, 1.f)));
@@ -108,18 +115,32 @@ public class Game extends Canvas {
 		dynamitesText = new TextEntity(0, 24, "Dynamites: 0");
 		rangeText = new TextEntity(0, 38, "Range: 0");
 		entitiesText = new TextEntity(0, 52, "Entities: 0");
+		pointsText = new TextEntity(0, 66, "Points: 0");
+		
+		wonGameText = new TextEntity(40, 357, "You Won! Press ENTER to start next round!", 40.F, Color.ORANGE);
+		lostGameText = new TextEntity(40, 357, "You Lost! Press ENTER to start next round!", 40.F, Color.CYAN);
+		waitOnOtherPlayerText = new TextEntity(200, 407, "Waiting on other player...", 40.F, Color.YELLOW);
 
 		statusBoard.add(fpsText);
 		statusBoard.add(dynamitesText);
 		statusBoard.add(rangeText);
 		statusBoard.add(entitiesText);
+		statusBoard.add(pointsText);
+		
+		initTemporaryEntities();
+	}
+	
+	private void initTemporaryEntities() {	
+		gameBoard.add(new BackgroundEntity(
+				0, 0, gameBoard.getWidth(), gameBoard.getHeight(),
+				Color.getHSBColor(2/3.f, 0.3f, .1f)));
 		
 		if(multiplayer.getIs_server() == true) {
-			localPlayer = new PlayerEntity(0, 0, Color.white, multiplayer, false);
-			remotePlayer = new PlayerEntity(770, 640, Color.black, multiplayer, true);
+			localPlayer = new PlayerEntity(0, 0, Color.BLUE, multiplayer, false);
+			remotePlayer = new PlayerEntity(832 - PlayerEntity.getPlayerSize(), 704 - PlayerEntity.getPlayerSize(), Color.GREEN, multiplayer, true);
 		} else {
-			localPlayer = new PlayerEntity(770, 640, Color.black, multiplayer, false);
-			remotePlayer = new PlayerEntity(0, 0, Color.white, multiplayer, true);
+			localPlayer = new PlayerEntity(832 - PlayerEntity.getPlayerSize(), 704 - PlayerEntity.getPlayerSize(), Color.GREEN, multiplayer, false);
+			remotePlayer = new PlayerEntity(0, 0, Color.BLUE, multiplayer, true);
 		}
 		
 		synchronize();
@@ -149,11 +170,10 @@ public class Game extends Canvas {
 					}
 				}			
 			}
-		}
-		
+		}	
 		synchronize();
 	}
-	
+
 	private Graphics2D initGraphics() {
 		Graphics2D g2d = (Graphics2D)strategy.getDrawGraphics();
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -166,6 +186,7 @@ public class Game extends Canvas {
 		dynamitesText.setText("Dynamites: " + localPlayer.getDynamitesCount());
 		rangeText.setText("Range: " + localPlayer.getDynamiteRange());
 		entitiesText.setText("Entities: " + gameBoard.entitiesCount());
+		pointsText.setText("Points: " + points);
 	}
 	
 	private void handleBeamCollisions() {
@@ -173,8 +194,18 @@ public class Game extends Canvas {
 			if(entity instanceof BeamEntity)
 				for(Entity anotherEntity : gameBoard.getEntities()) {
 					if(entity.collidesWith(anotherEntity)) {
-						if(anotherEntity instanceof PlayerEntity)
+						if(anotherEntity instanceof PlayerEntity) {
+							if(((PlayerEntity)anotherEntity).isRemote() == true) {
+								lost_game = false;
+								points++;
+								gameBoard.add(wonGameText);
+							} else {
+								lost_game = true;
+								gameBoard.add(lostGameText);
+							}
+							ended_game = true;
 							gameBoard.remove(anotherEntity);
+						}
 						else if(anotherEntity instanceof BoxEntity) {
 							gameBoard.remove(anotherEntity);
 							if(((BoxEntity)anotherEntity).getBonus() > 0) {
@@ -213,17 +244,33 @@ public class Game extends Canvas {
 	}	
 	
 	private void doLogic() {		
-		for(Entity entity : gameBoard.getEntities())
-			entity.tick(this);
-		
-		updateTexts();
-		handleBeamCollisions();
-		handlePickingUp();
-		
-		statusBoard.tick();
-		gameBoard.tick();
+		if(ended_game == false) {
+			for(Entity entity : gameBoard.getEntities())
+				entity.tick(this);
+			
+			updateTexts();
+			handleBeamCollisions();
+			handlePickingUp();
+			
+			statusBoard.tick();
+			gameBoard.tick();
+		} else {
+			if(keyInputHandler.isEnterPressed() == true) {
+				ended_game = false;
+				statusBoard.add(waitOnOtherPlayerText);
+				clearTemporaryEntities();
+				initTemporaryEntities();
+				statusBoard.remove(waitOnOtherPlayerText);
+			}
+			
+		}
 	}
 	
+	private void clearTemporaryEntities() {
+		gameBoard.removeAllEntities();
+		
+	}
+
 	private void clear(Graphics2D g2d) {
 		g2d.setColor(Color.black);
 		g2d.fillRect(0, 0, getWidth(), getHeight());
@@ -404,11 +451,23 @@ public class Game extends Canvas {
 		while(true) {
 			fps.measure();	
 			
-			doLogic();			
-			g2d = initGraphics();			
-			clear(g2d);
-			draw(g2d);
-			
+			if(ended_game == false) {
+				doLogic();
+				g2d = initGraphics();			
+				clear(g2d);
+				draw(g2d);
+			} else {
+				if(keyInputHandler.isEnterPressed() == true) {
+					ended_game = false;
+					gameBoard.add(waitOnOtherPlayerText);
+					gameBoard.tick();
+					g2d = initGraphics();			
+					clear(g2d);
+					draw(g2d);
+					clearTemporaryEntities();
+					initTemporaryEntities();
+				}
+			}
 			fps.stabilize();
 		}
 	}

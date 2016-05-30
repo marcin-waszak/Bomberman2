@@ -34,6 +34,11 @@ public class Board {
 		return true;
 	}
 	
+	public boolean removeAllEntities() {
+		entities.clear();
+		return true;
+	}
+	
 	public boolean remove(Entity entity) {
 		to_remove.add(entity);
 		return true;

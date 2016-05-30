@@ -11,7 +11,7 @@ public class PlayerEntity extends Entity {
 	private int dynamiteRange = 1;
 	private Color color;
 	private Multiplayer multiplayer;
-	private boolean remote;	
+	private boolean remote;
 
 	public PlayerEntity(double x, double y, Color color, Multiplayer multiplayer, boolean remote) {
 		super(x, y);
@@ -134,8 +134,12 @@ public class PlayerEntity extends Entity {
 		dynamiteRange++;
 	}
 	
-	public int getPlayerSize() {
+	public static int getPlayerSize() {
 		return playerSize;
+	}
+	
+	public boolean isRemote() {
+		return remote;
 	}
 	
 	@Override

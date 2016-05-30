@@ -76,7 +76,8 @@ public class Multiplayer {
 		try {
 			dos.writeInt(i);
 		} catch (IOException e) {
-			e.printStackTrace();
+	//		e.printStackTrace();
+			System.exit(1);
 		}
 	}
 	
@@ -84,7 +85,8 @@ public class Multiplayer {
 		try {
 			return dis.readInt();
 		} catch (IOException e) {
-			e.printStackTrace();
+	//		e.printStackTrace();
+			System.exit(1);
 			return 0;
 		}
 	}

@@ -7,6 +7,7 @@ public class KeyInputHandler extends KeyAdapter {
 		boolean up_pressed;
 		boolean down_pressed;
 		boolean space_pressed;
+		boolean enter_pressed;
 		
 		public void keyPressed(KeyEvent e) {					
 			if (e.getKeyCode() == KeyEvent.VK_LEFT) {
@@ -23,6 +24,9 @@ public class KeyInputHandler extends KeyAdapter {
 			}
 			if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
 				space_pressed = true;
+			}
+			if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+				enter_pressed = true;
 			}
 		} 
 		
@@ -41,6 +45,9 @@ public class KeyInputHandler extends KeyAdapter {
 			}
 			if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
 				space_pressed = false;
+			}
+			if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+				enter_pressed = false;
 			}
 		}
 
@@ -69,5 +76,9 @@ public class KeyInputHandler extends KeyAdapter {
 		
 		public boolean isSpacePressed() {
 			return space_pressed;
+		}
+		
+		public boolean isEnterPressed() {
+			return enter_pressed;
 		}
 	}

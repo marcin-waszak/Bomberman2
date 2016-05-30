@@ -14,6 +14,13 @@ public class TextEntity extends Entity {
 		this.size = 12.f;
 	}
 	
+	public TextEntity(double x, double y, String text, float size, Color color) {
+		super(x, y);
+		this.color = color;
+		this.text = text;
+		this.size = size;
+	}
+	
 	public void setText(String text) {
 		this.text = text;
 	}
