@@ -244,7 +244,6 @@ public class Game extends Canvas {
 	}	
 	
 	private void doLogic() {		
-		if(ended_game == false) {
 			for(Entity entity : gameBoard.getEntities())
 				entity.tick(this);
 			
@@ -254,16 +253,6 @@ public class Game extends Canvas {
 			
 			statusBoard.tick();
 			gameBoard.tick();
-		} else {
-			if(keyInputHandler.isEnterPressed() == true) {
-				ended_game = false;
-				statusBoard.add(waitOnOtherPlayerText);
-				clearTemporaryEntities();
-				initTemporaryEntities();
-				statusBoard.remove(waitOnOtherPlayerText);
-			}
-			
-		}
 	}
 	
 	private void clearTemporaryEntities() {
