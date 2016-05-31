@@ -1,8 +1,13 @@
 import java.awt.Point;
-
+/**
+ * GameBoard class is used to group all the game entities
+ */
 public class GameBoard extends Board {
 	int[][] grid;
 
+	/**
+	 * GameBoard constructor
+	 */
 	public GameBoard(int x, int y, int width, int height) {
 		super(x, y, width, height);
 		grid = new int[13][11];
@@ -12,6 +17,10 @@ public class GameBoard extends Board {
 				grid[i][k] = 0;
 	}
 	
+	/**
+	 * Add entity to the game.
+	 * @return Is operation succesfully added.
+	 */
 	public boolean add(Entity entity) {
 		Point gp = getGrid(entity.getX(), entity.getY());
 		
@@ -40,6 +49,10 @@ public class GameBoard extends Board {
 		return true;
 	}
 	
+	/**
+	 * Remove entity from the game.
+	 * @return Is operation succesfully removed.
+	 */
 	public boolean remove(Entity entity) {
 		Point gp = getGrid(entity.getX(), entity.getY());
 		
@@ -49,10 +62,18 @@ public class GameBoard extends Board {
 		return true;
 	}
 	
+	/**
+	 * Provides quantization of coordinates.
+	 * @return 
+	 */
 	public Point getGrid(double x, double y) {
 		return new Point((int)(x/64.0), (int)(y/64.0));
 	}
 	
+	/**
+	 * Provides quantization of coordinates back to pixel fotmat.
+	 * @return 
+	 */
 	public Point getGridPixel(double x, double y) {
 		return new Point(64*(int)(x/64.0), 64*(int)(y/64.0));
 	}

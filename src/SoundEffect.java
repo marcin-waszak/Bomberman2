@@ -12,23 +12,34 @@ import javax.sound.sampled.*;
  * the static variable SoundEffect.volume to mute the sound.
  */
 public enum SoundEffect {
+	/**
+	 * Provides sound effects enumerator
+	 */
 	EXPLOSION("sound/explosion.wav"),
 	GIBS("sound/gibs.wav"),
 	PICKUP("sound/pickup.wav"),
 	PLANT("sound/plant2.wav");
 
-	// Nested class for specifying volume
+	/**
+	 * Nested class for specifying volume
+	 */
 	public static enum Volume {
 		MUTE, LOW, MEDIUM, HIGH
 	}
 
+	/** Type of volume to be played */
 	public static Volume volume = Volume.LOW;
 
-	// Each sound effect has its own clip, loaded with its own sound file.
+	
+	/**Each sound effect has its own clip, loaded with its own sound file. */
 	private Clip clip;
 
-	// Constructor to construct each element of the enum with its own sound
-	// file.
+	/**
+	 * Constructor to construct each element of the enum
+	 * with its own sound file.
+	 *
+	 * @param soundFileName
+	 */
 	SoundEffect(String soundFileName) {
 		try {
 			// Use URL (instead of File) to read from disk and JAR.
@@ -48,7 +59,9 @@ public enum SoundEffect {
 		}
 	}
 
-	// Play or Re-play the sound effect from the beginning, by rewinding.
+	/**
+	 * Play or Re-play the sound effect from the beginning, by rewinding.
+	 */
 	public void play() {
 		if (volume != Volume.MUTE) {
 			if (clip.isRunning())
@@ -58,7 +71,9 @@ public enum SoundEffect {
 		}
 	}
 
-	// Optional static method to pre-load all the sound files.
+	/**
+	 *Optional static method to pre-load all the sound files.
+	 */
 	static void init() {
 		values(); // calls the constructor for all the elements
 	}

@@ -1,5 +1,3 @@
-//package org.newdawn.spaceinvaders;
-
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -11,10 +9,22 @@ import java.net.URL;
 import java.util.HashMap;
 
 import javax.imageio.ImageIO;
-
+/**
+ * A resource manager for sprites in the game. Its often quite important
+ * how and where you get your game resources from. In most cases
+ * it makes sense to have a central resource loader that goes away, gets
+ * your resources and caches them for future use.
+ */
 public class SpriteStore {
+	/** Container for sprite textures */
 	private HashMap<String, Sprite> sprites = new HashMap<String, Sprite>();
 	
+	/**
+	 * Retrieve a sprite from the store
+	 * 
+	 * @param ref The reference to the image to use for the sprite
+	 * @return A sprite instance containing an accelerate image of the request reference
+	 */
 	public Sprite getSprite(String ref) {
 		// if we've already got the sprite in the cache
 		// then just return the existing version
@@ -61,6 +71,11 @@ public class SpriteStore {
 		return sprite;
 	}
 	
+	/**
+	 * Utility method to handle resource loading failure
+	 * 
+	 * @param message The message to display on failure
+	 */
 	private void fail(String message) {
 		// we're pretty dramatic here, if a resource isn't available
 		// we dump the message and exit the game

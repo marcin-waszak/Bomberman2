@@ -46,6 +46,9 @@ public class  MessageListener implements Runnable {
 			case(3):
 				game.notifyRemotePlayerSettingBomb((i & 0x0000FFF0) >> 4, (i & 0x0FFF0000) >> 16);
 				break;
+			case(4):
+				game.notifyEndingGame((i & 0x0000FFF0) >> 4, (i & 0x0FFF0000));
+				break;
 			case(9):
 				game.notifySemaphoreRelease();
 			}
