@@ -352,6 +352,11 @@ public class Game extends Canvas {
 		
 		SoundEffect.EXPLOSION.play();
 		
+		BeamEntity middle_beam = new BeamEntity(dynamite.getX(), dynamite.getY(),
+				spriteStore, "sprites/beam.png");
+		
+		gameBoard.add(middle_beam);
+		
 		outerloop:
 		for(int i = 1; i <= range; i++) {
 			BeamEntity beam = new BeamEntity(dynamite.getX() + i*64, dynamite.getY(),
