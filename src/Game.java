@@ -119,6 +119,9 @@ public class Game extends Canvas {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		SoundEffect.init();
+		SoundEffect.volume = SoundEffect.Volume.HIGH;  // un-mute
 	}
 	
 	private void initEntities() {	
@@ -201,6 +204,7 @@ public class Game extends Canvas {
 				for(Entity anotherEntity : gameBoard.getEntities()) {
 					if(entity.collidesWith(anotherEntity)) {
 						if(anotherEntity instanceof PlayerEntity) {
+							SoundEffect.GIBS.play();
 							if(((PlayerEntity)anotherEntity).isRemote() == true) {
 								points++;
 								remotePlayerDied = true;
@@ -232,6 +236,7 @@ public class Game extends Canvas {
 				for(Entity anotherEntity : gameBoard.getEntities()) {
 					if(entity.collidesWith(anotherEntity)) {
 						if(anotherEntity instanceof PickupEntity) {
+							SoundEffect.PICKUP.play();
 							switch(((PickupEntity)anotherEntity).getBonus()) {
 							case 1:
 								((PlayerEntity) entity).increaseDynamites();
@@ -334,6 +339,8 @@ public class Game extends Canvas {
 			multiplayer.sendMessage(3 << 0 | gPoint.x << 4 | gPoint.y << 16 );
 			player.decreaseDynamite();
 		}
+		
+		SoundEffect.PLANT.play();
 	}
 	
 	public void explodeDynamite(DynamiteEntity dynamite) {
@@ -342,6 +349,8 @@ public class Game extends Canvas {
 		
 		gameBoard.remove(dynamite);
 		owner.increaseDynamites();
+		
+		SoundEffect.EXPLOSION.play();
 		
 		outerloop:
 		for(int i = 1; i <= range; i++) {
