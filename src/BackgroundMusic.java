@@ -11,10 +11,20 @@ import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Sequencer;
 
+/**
+ * 
+ * Class used for music playback.
+ *
+ */
 public class BackgroundMusic {
+	/** Sequencer handle*/
 	Sequencer sequencer;
+	/** MIDI file path*/
 	String midiFile;
 
+	/**
+	 * Constructor of BackgorundMusic
+	 */
 	public BackgroundMusic() {
 		try {
 			sequencer = MidiSystem.getSequencer();
@@ -24,12 +34,13 @@ public class BackgroundMusic {
 		midiFile = "sound/music.mid";
 	}
 
+	/**
+	 * Play music.
+	 * Obtains the default Sequencer connected to a default device.
+	 * Opens the device, indicating that it should now acquire any
+	 * system resources it requires and become operational.
+	 */
 	public void play() {
-		// Obtains the default Sequencer connected to a default device.
-
-		// Opens the device, indicating that it should now acquire any
-		// system resources it requires and become operational.
-
 		URL url = this.getClass().getClassLoader().getResource(midiFile);
 		try {
 			sequencer = MidiSystem.getSequencer();

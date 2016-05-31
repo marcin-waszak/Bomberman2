@@ -11,48 +11,87 @@ import java.util.concurrent.Semaphore;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+/**
+ * 
+ * Main Game Class that extends Canvas. We need to use it only once, and only
+ * in Main() method.
+ *
+ */
+
 public class Game extends Canvas {
+	/** Width of game window*/
 	static final int R_WIDTH = 1024;
+	/** Height of game window*/
 	static final int R_HEIGHT = 720;
+	/** Number of bonuses in the game*/
 	static final int NUM_OF_DIFFERENT_BONUSES = 2;	
 	
+	/** Semaphore needed to synnc players at the beginning and at the end of game*/
 	private Semaphore waitOnOtherPlayer;
+	/** Handle for random*/
 	private Random random;
+	/** Handle for keyboard input*/
 	private KeyInputHandler keyInputHandler;
+	/** Buffer strategy used for double buffering*/
 	private BufferStrategy strategy;
+	/** Main FPS handle*/
 	private FPS fps;
+	/** Main sprite store handle*/
 	private SpriteStore spriteStore;
-	
+	/** Handler for multiplayer game*/
 	private Multiplayer multiplayer;
+	/** Handle for messages thread*/
 	private MessageListener messageListener;
 	
+	/** Handle for game playground*/
 	private GameBoard gameBoard;
+	/** Handle for statistics space*/
 	private Board statusBoard;
 
+	/** Handle for local player*/
 	private PlayerEntity localPlayer;
+	/** Handle for remote player*/
 	private PlayerEntity remotePlayer;
 	
+	/** Handle for fps text*/
 	private TextEntity fpsText;
+	/** Handle for dynamites number text*/
 	private TextEntity dynamitesText;
+	/** Handle for range od dynamite text*/
 	private TextEntity rangeText;
+	/** Handle for entity number text*/
 	private TextEntity entitiesText;
+	/** Handle for points counter text*/
 	private TextEntity pointsText;
+	/** Handle for winning text*/
 	private TextEntity wonGameText;
+	/** Handle for loosing text*/
 	private TextEntity lostGameText;
+	/** Handle for drawing the round text*/
 	private TextEntity drawGameText;
+	/** Handle for awaiting fot another player text*/
 	private TextEntity waitOnOtherPlayerText;
 	
+	/** Flag for indicate epilog text*/
 	private boolean isEpilogTextSet;
 	
+	/** Variable containing current players points*/
 	private int points;
+	/** Flag for indicate end of game*/
 	private boolean gameEnded;
+	/** Flag for indicate a death of remote player*/
 	private boolean remotePlayerDied;
+	/** Flag for indicate a death of local player*/
 	private boolean localPlayerDied;
 	
+	/** Main handle for MIDI player for background music*/
 	private BackgroundMusic backgroundMusic;
 
-	public Game() {
-		
+	/**
+	 * Constructor method for Game class.
+	 * It is main game class, we are using it only once.
+	 */
+	public Game() {		
 		// create or join server
 		multiplayer = new Multiplayer();
 		
@@ -124,6 +163,9 @@ public class Game extends Canvas {
 		SoundEffect.volume = SoundEffect.Volume.HIGH;  // un-mute
 	}
 	
+	/**
+	 * Method for initialization of static entities only.
+	 */
 	private void initEntities() {	
 		statusBoard.add(new BackgroundEntity(
 				0, 0, statusBoard.getWidth(), statusBoard.getHeight(),
@@ -149,6 +191,9 @@ public class Game extends Canvas {
 		initTemporaryEntities();
 	}
 	
+	/**
+	 * Method for initialization of dynamic entities only.
+	 */
 	private void initTemporaryEntities() {	
 		gameBoard.add(new BackgroundEntity(
 				0, 0, gameBoard.getWidth(), gameBoard.getHeight(),
@@ -183,6 +228,10 @@ public class Game extends Canvas {
 		synchronize();
 	}
 
+	/**
+	 * Method for Graphics 2D handler initialization.
+	 * @return Graphics2D handler.
+	 */
 	private Graphics2D initGraphics() {
 		Graphics2D g2d = (Graphics2D)strategy.getDrawGraphics();
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -190,6 +239,9 @@ public class Game extends Canvas {
 		return g2d;
 	}
 	
+	/**
+	 * Method used for refreshing statistics texts.
+	 */
 	private void updateTexts() {
 		fpsText.setText("FPS: " + fps.getValue());
 		dynamitesText.setText("Dynamites: " + localPlayer.getDynamitesCount());
@@ -198,6 +250,9 @@ public class Game extends Canvas {
 		pointsText.setText("Points: " + points);
 	}
 	
+	/**
+	 * Method used for detecting and handling beam collisions.
+	 */
 	private void handleBeamCollisions() {
 		for(Entity entity : gameBoard.getEntities())
 			if(entity instanceof BeamEntity)
@@ -230,6 +285,9 @@ public class Game extends Canvas {
 				}
 	}
 	
+	/**
+	 * Method used for detecting and handing picking up items.
+	 */
 	private void handlePickingUp() {
 		for(Entity entity : gameBoard.getEntities())
 			if(entity instanceof PlayerEntity)
@@ -252,6 +310,9 @@ public class Game extends Canvas {
 				}
 	}	
 	
+	/**
+	 * Method used for making logical tick for all entities in game.
+	 */
 	private void doLogic() {		
 			for(Entity entity : gameBoard.getEntities())
 				entity.tick(this);
@@ -264,16 +325,27 @@ public class Game extends Canvas {
 			gameBoard.tick();
 	}
 	
+	/**
+	 * Method used for clearing dynamic entities.
+	 */
 	private void clearTemporaryEntities() {
 		gameBoard.removeAllEntities();
 		
 	}
 
+	/**
+	 * Method used for clearing Graphics2D handle.
+	 * @param g2d Graphics2D handle.
+	 */
 	private void clear(Graphics2D g2d) {
 		g2d.setColor(Color.black);
 		g2d.fillRect(0, 0, getWidth(), getHeight());
 	}
 	
+	/**
+	 * Method used showing up all items contained in boards.
+	 * @param g2d Graphics2D handle.
+	 */
 	private void draw(Graphics2D g2d) 	{
 		gameBoard.draw(g2d);
 		statusBoard.draw(g2d);
@@ -282,14 +354,28 @@ public class Game extends Canvas {
 		strategy.show();
 	}
 	
+	/**
+	 * Provides main key input handler.
+	 * @return Main key input handler.
+	 */
 	public KeyInputHandler getKeyInputHandler() {
 		return keyInputHandler;
 	}
 	
-	public FPS getFPSHandler() { //TODO
+	/**
+	 * Provides main key input handler.
+	 * @return Main key input handler.
+	 */
+	public FPS getFPSHandler() {
 		return fps;
 	}
 	
+	/**
+	 * Method used for checking if point is placed on spawnpoint.
+	 * @param gx X coord.
+	 * @param gy Y coord.
+	 * @return The verdict.
+	 */
 	private boolean isSpawnPoint(int gx, int gy) {
 		if(gx == 0 && gy == 0)
 			return true;
@@ -307,6 +393,14 @@ public class Game extends Canvas {
 		return false;
 	}
 	
+	/**
+	 * Method used for penetration of different entities.
+	 * @param beam Beam handle.
+	 * @param entity Entity handle.
+	 * @return 0 for doing nothing,
+	 * 1 for continue of current loop request,
+	 * 2 for break outerloop request.
+	 */
 	private int beamPenetrator(BeamEntity beam, Entity entity) {		
 		if(entity instanceof BackgroundEntity)
 			return 1; // continue
@@ -332,6 +426,10 @@ public class Game extends Canvas {
 		return 0; // do nothing
 	}
 	
+	/**
+	 * Force to plant the dynamite.
+	 * @param player Owner of the our new dynamite.
+	 */
 	public void PlantDynamite(PlayerEntity player) {		
 		Point gPoint = gameBoard.getGridPixel(24+player.getX(), 24+player.getY());
 		if(gameBoard.add(new DynamiteEntity(gPoint.x, gPoint.y,
@@ -343,6 +441,10 @@ public class Game extends Canvas {
 		SoundEffect.PLANT.play();
 	}
 	
+	/**
+	 * Force to dotanate the dynamite.
+	 * @param dynamite Dynamite handle we want to detonate.
+	 */
 	public void explodeDynamite(DynamiteEntity dynamite) {
 		PlayerEntity owner = dynamite.getOwner();
 		int range = owner.getDynamiteRange();
@@ -422,12 +524,20 @@ public class Game extends Canvas {
 		}
 	}
 	
+	/**
+	 * Force to create BoxEntity and attach optional pickup.
+	 * @param x X grid position.
+	 * @param y Y grid position.
+	 */
 	private void spawnBox(int x, int y) {
 		int i = ((random.nextInt(5) <= 0) ? (random.nextInt(NUM_OF_DIFFERENT_BONUSES) + 1) : 0);
 		gameBoard.add(new BoxEntity(64*x, 64*y, spriteStore, "sprites/box.png", i));					
 		multiplayer.sendMessage(1 << 0 | x << 4 | y << 16 | i << 28);
 	}
 	
+	/**
+	 * Handles epilog text.
+	 */
 	private void epilogText() {
 		if(isEpilogTextSet == false) {
 			if(localPlayerDied == true) {			
@@ -452,6 +562,9 @@ public class Game extends Canvas {
 		}
 	}
 	
+	/**
+	 * Handles end of the round.
+	 */
 	private void endRound() {
 			epilogText();
 			
@@ -471,6 +584,9 @@ public class Game extends Canvas {
 			}
 	}
 	
+	/**
+	 * 
+	 */
 	private void synchronize() {
 		multiplayer.sendMessage(9);
 		try {
@@ -480,27 +596,53 @@ public class Game extends Canvas {
 		}
 	}
 	
-	public void notifyAddBox(int x, int y, int i) {
-		gameBoard.add(new BoxEntity(64*x, 64*y, spriteStore, "sprites/box.png", i));
+	/**
+	 * Add box notification.
+	 * @param x X position.
+	 * @param y Y position.
+	 * @param i Bonus type, 0 when there's no bonus.
+	 */
+	public void notifyAddBox(int x, int y, int bonus_type) {
+		gameBoard.add(new BoxEntity(64*x, 64*y, spriteStore, "sprites/box.png", bonus_type));
 	}
 	
+	/**
+	 * Force semaphore release.
+	 */
 	public void notifySemaphoreRelease() {
 		waitOnOtherPlayer.release();
 	}
 	
+	/**
+	 * Force set player position.
+	 * @param x X new postion.
+	 * @param y Y new position.
+	 */
 	public void notifySetRemotePlayerPosition(int x, int y) {
 		remotePlayer.setPosition(x, y);
 	}
 	
+	/**
+	 * Force to plant the bomb by remote.
+	 * @param x X bomb position.
+	 * @param y Y bomb position.
+	 */
 	public void notifyRemotePlayerSettingBomb(int x, int y) {
 		gameBoard.add(new DynamiteEntity(x, y,
 				spriteStore, "sprites/dynamite.png", remotePlayer));
 	}
 	
+	/**
+	 * Force to finish the beam.
+	 * @param beam Beam handle we want to finish.
+	 */
 	public void finishBeam(BeamEntity beam) {
 		gameBoard.remove(beam);
 	}
 	
+	/**
+	 * Main infinite game loop.
+	 */
 	public void gameLoop() {
 		Graphics2D g2d;
 		
@@ -519,6 +661,10 @@ public class Game extends Canvas {
 		}
 	}
 	
+	/**
+	 * The beginning of whole world.
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		Game game = new Game();
 		
